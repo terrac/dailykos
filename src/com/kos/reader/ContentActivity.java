@@ -3,6 +3,7 @@ package com.kos.reader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -28,11 +29,11 @@ public class ContentActivity extends Activity {
 
 	String value;
 	String initial;
+	String images;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_content);
-		WebView tv = (WebView) findViewById(R.id.textView1);
 		String stringExtra = getIntent().getStringExtra("content");
 
 		Uri parcelableExtra = getIntent().getParcelableExtra("uri");
@@ -40,8 +41,7 @@ public class ContentActivity extends Activity {
 		// stringExtra.substring(stringExtra.length()-10));
 		initial = stringExtra;
 		stringExtra += "<br> loading ....";
-		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
-				"text/html", "UTF-8", "about:blank");
+		loadData(stringExtra);
 
 		new AsyncTask<String, Void, String>() {
 
@@ -70,14 +70,25 @@ public class ContentActivity extends Activity {
 				}
 				Toast toast = Toast.makeText(context, text, duration);
 				toast.show();
-				WebView tv = (WebView) findViewById(R.id.textView1);
-
-				//tv.loadData(value, "text/html; charset=UTF-8", null);
-				tv.loadDataWithBaseURL("http://www.dailykos.com", value,
-						"text/html", "UTF-8", "about:blank");
-
+				loadData(value);
 			}
 		}.execute("");
+	}
+
+	public void loadData(String stringExtra) {
+		
+		if(images != null && images.equals(imgTypes[2])){
+			String ignore = 
+					"<style type=\"text/css\">\n" + 
+					"img\n" + 
+					"{ display: none; }\n"+ 
+					"</style> ";
+			stringExtra = ignore + stringExtra;
+		}
+		WebView tv = (WebView) findViewById(R.id.textView1);
+		
+		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
+				"text/html", "UTF-8", "about:blank");
 	}
 
 	@Override
@@ -85,6 +96,7 @@ public class ContentActivity extends Activity {
 		getMenuInflater().inflate(R.menu.activity_content, menu);
 		return true;
 	}
+	String[] imgTypes = new String[]{"Normal Images","No Images","Resized Images"};
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(R.id.menu_comments == item.getItemId()){
@@ -100,11 +112,19 @@ public class ContentActivity extends Activity {
 
 			WebView tv = (WebView) findViewById(R.id.textView1);
 			//tv.loadData(stripHtml(value), "text/plain; charset=UTF-8", null);
-			tv.loadDataWithBaseURL("http://www.dailykos.com", stripHtml(value),
-					"text/html", "UTF-8", "about:blank");
+			loadData(stripHtml(value));
 
 		}
-
+		if(R.id.menu_images == item.getItemId()){
+			String t = (String) item.getTitle();
+			int i=Arrays.asList(imgTypes).indexOf(t);
+			if(i >= 2){
+				i = 0;
+			} else {
+				i++;
+			}
+			item.setTitle(imgTypes[i]);
+		}
 		
 		return super.onOptionsItemSelected(item);
 	}
