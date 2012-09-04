@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
         try {
 			final ListView listView = (ListView) findViewById(R.id.listView1);
 
-	        listView.setAdapter(new ArrayAdapter<String>(this,  android.R.layout.simple_list_item_1, new String[]{"Recommended","community"}));
+	        listView.setAdapter(new ArrayAdapter<String>(this,  android.R.layout.simple_list_item_1, new String[]{"Recommended","Community","Main"}));
 			OnItemClickListener onClickListener = new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 						long arg3) {
@@ -37,6 +37,12 @@ public class MainActivity extends Activity {
 					if(position == 1){
 						url = "http://www.dailykos.com/rss/tag:community.xml";
 					}
+					
+					if(position == 2){
+						url = "http://rss.dailykos.com/dailykos/index.xml";
+					}
+					
+					
 					Intent myIntent = new Intent(MainActivity.this, TitlesActivity.class);
 	    			myIntent.putExtra("url",url);
 	    			MainActivity.this.startActivity(myIntent);

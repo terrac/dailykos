@@ -27,6 +27,7 @@ import android.widget.Toast;
 public class ContentActivity extends Activity {
 
 	String value;
+	String initial;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,8 +38,10 @@ public class ContentActivity extends Activity {
 		Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
 		// stringExtra.substring(stringExtra.length()-10));
+		initial = stringExtra;
 		stringExtra += "<br> loading ....";
-		tv.loadData(stringExtra, "text/html; charset=UTF-8", null);
+		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
+				"text/html", "UTF-8", "about:blank");
 
 		new AsyncTask<String, Void, String>() {
 
@@ -59,6 +62,12 @@ public class ContentActivity extends Activity {
 				CharSequence text = "Loaded.";
 				int duration = Toast.LENGTH_SHORT;
 
+				if(initial.length() > value.length()){
+					text = "Already Loaded";
+					Uri parcelableExtra = getIntent().getParcelableExtra("uri");
+					
+					value = initial+"<a href=" + parcelableExtra +   "> go to kos page</a>";
+				}
 				Toast toast = Toast.makeText(context, text, duration);
 				toast.show();
 				WebView tv = (WebView) findViewById(R.id.textView1);
