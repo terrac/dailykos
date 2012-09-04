@@ -1,0 +1,9 @@
+notes
+1 take the data from the inital get
+2 do the same logic to grab the comments
+3 dump the comments onto a link
+
+4 make comments work by posting the data with the correct url so that it will just work
+
+<ul class="cm i0">
+<li id="eP">    
