@@ -14,18 +14,28 @@ import org.apache.http.protocol.HttpContext;
 import org.xml.sax.XMLReader;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.TagHandler;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.WindowManager;
 import android.webkit.WebView;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class ContentActivity extends Activity {
@@ -36,6 +46,7 @@ public class ContentActivity extends Activity {
 	boolean plainText = false;
 
 	boolean tutorialMessage = false;
+	private int fontSize;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -101,13 +112,27 @@ public class ContentActivity extends Activity {
 				"		//--></script>" + stringExtra;
 	
 		
-		
-		
-		if (ignoreImages) {
-			String ignore = "<style type=\"text/css\">\n" + "img\n"
-					+ "{ display: none; }\n" + "</style> ";
+		if(ignoreImages){
+			String ignore = 
+					"<style type=\"text/css\">\n" + 
+					"img\n" + 
+					"{ display: none; }\n"+ 
+					"</style> ";
 			stringExtra = ignore + stringExtra;
 		}
+		String ignoreIFrame = 
+				"<style type=\"text/css\">\n" + 
+				"iframe\n" + 
+				"{ display: none; }\n"+ 
+				"</style> ";
+		stringExtra = ignoreIFrame + stringExtra;
+	
+//		if (fontSize != 0) {
+//			String size = "<style type=\"text/css\">\n" + "body\n"
+//					+ "{ font-size:"+fontSize+"em; }\n" + "</style> ";
+//			stringExtra = size + stringExtra;
+//		}
+
 		WebView tv = (WebView) findViewById(R.id.textView1);
 
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
@@ -132,19 +157,19 @@ public class ContentActivity extends Activity {
 			}
 
 		}
-		if (R.id.menu_plain == item.getItemId()) {
-
-			item.setChecked(!item.isChecked());
-			plainText = item.isChecked();
-			if (item.isChecked()) {
-				item.setTitle("Complex Html");
-			} else {
-				item.setTitle("Simple Html");
-
-			}
-			loadData(value);
-
-		}
+//		if (R.id.menu_plain == item.getItemId()) {
+//
+//			item.setChecked(!item.isChecked());
+//			plainText = item.isChecked();
+//			if (item.isChecked()) {
+//				item.setTitle("Complex Html");
+//			} else {
+//				item.setTitle("Simple Html");
+//
+//			}
+//			loadData(value);
+//
+//		}
 		if (R.id.menu_images == item.getItemId()) {
 			
 			item.setChecked(!item.isChecked());
@@ -158,6 +183,36 @@ public class ContentActivity extends Activity {
 			loadData(value);
 
 		}
+		
+//		if (R.id.menu_fontsize == item.getItemId()) {
+//			final EditText et=new EditText(getApplicationContext());
+//			et.setInputType(InputType.TYPE_CLASS_NUMBER);
+//			
+//			final AlertDialog dialog = new AlertDialog.Builder(this)
+//		    .setTitle("Font Size")
+//		    .setView(et).create();
+//			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+//			dialog.show();
+//			
+//			et.setOnEditorActionListener(new OnEditorActionListener() {
+//				
+//				@Override
+//				public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+//					if(arg2 == null){
+//						fontSize=Integer.getInteger(et.getText().toString());
+//						
+//						dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+//						
+//						dialog.dismiss();
+//						
+//											}
+//					return false;
+//				}
+//			});
+//	
+//
+//
+//		}
 
 		return super.onOptionsItemSelected(item);
 	}
