@@ -18,6 +18,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.AsyncTask;
@@ -47,6 +49,13 @@ public class ContentActivity extends Activity {
 
 	boolean tutorialMessage = false;
 	private int fontSize;
+	final public static String css = "		<script type=\"text/javascript\"><!--\n" + 
+			"		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n" +
+			"	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n" + 
+			"	<!-- can this be unified? -->\n" + 
+			"	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n" + 
+			"		" + 
+			"		//--></script>";
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,9 +103,13 @@ public class ContentActivity extends Activity {
 		}.execute("");
 		
 		
-		if(!tutorialMessage){
+		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+		if(!preferences.getBoolean("tutorial", false)){
+			Editor edit = preferences.edit();
+			edit.putBoolean("tutorial", true);
+			edit.commit();
 			Toast.makeText(getApplicationContext(), "Use settings to format the diaries", Toast.LENGTH_SHORT).show();			
-			tutorialMessage = true;
+			
 		}
 		
 		loadData(value);
@@ -107,9 +120,7 @@ public class ContentActivity extends Activity {
 			stringExtra = stripHtml(stringExtra);
 		}
 		
-		stringExtra = "		<script type=\"text/javascript\"><!--\n" + 
-				"		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n" + 
-				"		//--></script>" + stringExtra;
+		stringExtra = css + stringExtra;
 	
 		
 		if(ignoreImages){
