@@ -1,6 +1,5 @@
 package com.kos.reader;
 
-import org.mcsoxford.rss.RSSFeed;
 import org.mcsoxford.rss.RSSReader;
 
 import android.app.Activity;

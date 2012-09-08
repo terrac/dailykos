@@ -24,6 +24,8 @@ import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.TagHandler;
@@ -44,18 +46,14 @@ public class ContentActivity extends Activity {
 
 	String value;
 	String initial;
-	boolean ignoreImages = true;
-	boolean plainText = false;
 
-	boolean tutorialMessage = false;
-	private int fontSize;
-	final public static String css = "		<script type=\"text/javascript\"><!--\n" + 
-			"		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n" +
-			"	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n" + 
-			"	<!-- can this be unified? -->\n" + 
-			"	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n" + 
-			"		" + 
-			"		//--></script>";
+	final public static String css = "		<script type=\"text/javascript\"><!--\n"
+			+ "		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n"
+			+ "	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
+			+ "	<!-- can this be unified? -->\n"
+			+ "	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n"
+			+ "		" + "		//--></script>";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,7 +63,7 @@ public class ContentActivity extends Activity {
 		Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
 		// stringExtra.substring(stringExtra.length()-10));
-		value= initial = stringExtra;
+		value = initial = stringExtra;
 		stringExtra += "<br> loading ....";
 		loadData(stringExtra);
 
@@ -101,48 +99,51 @@ public class ContentActivity extends Activity {
 				loadData(value);
 			}
 		}.execute("");
-		
-		
+
 		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-		if(!preferences.getBoolean("tutorial", false)){
+		if (!preferences.getBoolean("tutorial", false)) {
 			Editor edit = preferences.edit();
 			edit.putBoolean("tutorial", true);
 			edit.commit();
-			Toast.makeText(getApplicationContext(), "Use settings to format the diaries", Toast.LENGTH_SHORT).show();			
-			
+			Toast.makeText(getApplicationContext(),
+					"Use settings to format the diaries", Toast.LENGTH_SHORT)
+					.show();
+
 		}
-		
+
 		loadData(value);
 	}
 
 	public void loadData(String stringExtra) {
-		if (plainText) {
-			stringExtra = stripHtml(stringExtra);
-		}
-		
+		// if (plainText) {
+		// stringExtra = stripHtml(stringExtra);
+		// }
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	    
 		stringExtra = css + stringExtra;
-	
-		
-		if(ignoreImages){
-			String ignore = 
-					"<style type=\"text/css\">\n" + 
-					"img\n" + 
-					"{ display: none; }\n"+ 
-					"</style> ";
+
+		if (!preferences.getBoolean("imagesEnabled", false)) {
+			String ignore = "<style type=\"text/css\">\n" + "img\n"
+					+ "{ display: none; }\n" + "</style> ";
 			stringExtra = ignore + stringExtra;
 		}
-		String ignoreIFrame = 
-				"<style type=\"text/css\">\n" + 
-				"iframe\n" + 
-				"{ display: none; }\n"+ 
-				"</style> ";
-		stringExtra = ignoreIFrame + stringExtra;
-	
-//		if (fontSize != 0) {
-//			String size = "<style type=\"text/css\">\n" + "body\n"
-//					+ "{ font-size:"+fontSize+"em; }\n" + "</style> ";
-//			stringExtra = size + stringExtra;
-//		}
+		String ignoreIFrame = "<style type=\"text/css\">\n" + "iframe\n"
+				+ "{ display: none; }\n" + "</style> ";
+		if (!preferences.getBoolean("iframeEnabled", false)) {
+			stringExtra = ignoreIFrame + stringExtra;
+		}
+		
+		int fontSize;
+		try {
+			fontSize = Integer.parseInt(preferences.getString("fontSize", "0"));
+		} catch (NumberFormatException e) {
+			fontSize = 0;
+		}
+		if (fontSize != 0) {
+			String size = "<style type=\"text/css\">\n" + "body\n"
+					+ "{ font-size:" + fontSize + "em; }\n" + "</style> ";
+			stringExtra = size + stringExtra;
+		}
 
 		WebView tv = (WebView) findViewById(R.id.textView1);
 
@@ -152,10 +153,10 @@ public class ContentActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+
 		getMenuInflater().inflate(R.menu.activity_content, menu);
 		return true;
 	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (R.id.menu_comments == item.getItemId()) {
@@ -168,63 +169,12 @@ public class ContentActivity extends Activity {
 			}
 
 		}
-//		if (R.id.menu_plain == item.getItemId()) {
-//
-//			item.setChecked(!item.isChecked());
-//			plainText = item.isChecked();
-//			if (item.isChecked()) {
-//				item.setTitle("Complex Html");
-//			} else {
-//				item.setTitle("Simple Html");
-//
-//			}
-//			loadData(value);
-//
-//		}
-		if (R.id.menu_images == item.getItemId()) {
-			
-			item.setChecked(!item.isChecked());
-			ignoreImages = item.isChecked();
-			if (item.isChecked()) {
-				item.setTitle("Not Showing Images");
-			} else {
-				item.setTitle("Showing Images");
 
-			}
-			loadData(value);
 
+		if (R.id.menu_preferences == item.getItemId()) {
+			Intent myIntent = new Intent(ContentActivity.this, PrefsFragment.class);
+			ContentActivity.this.startActivity(myIntent);
 		}
-		
-//		if (R.id.menu_fontsize == item.getItemId()) {
-//			final EditText et=new EditText(getApplicationContext());
-//			et.setInputType(InputType.TYPE_CLASS_NUMBER);
-//			
-//			final AlertDialog dialog = new AlertDialog.Builder(this)
-//		    .setTitle("Font Size")
-//		    .setView(et).create();
-//			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-//			dialog.show();
-//			
-//			et.setOnEditorActionListener(new OnEditorActionListener() {
-//				
-//				@Override
-//				public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
-//					if(arg2 == null){
-//						fontSize=Integer.getInteger(et.getText().toString());
-//						
-//						dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-//						
-//						dialog.dismiss();
-//						
-//											}
-//					return false;
-//				}
-//			});
-//	
-//
-//
-//		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -248,7 +198,7 @@ public class ContentActivity extends Activity {
 						count = 4;
 					}
 					if (count == 4) {
-						//Log.d("content", line);
+						// Log.d("content", line);
 						comments.append(line + "\n");
 					}
 					if (line.contains("<li id=\"eP\">")) {
@@ -281,6 +231,6 @@ public class ContentActivity extends Activity {
 	public String stripHtml(String a) {
 		Html.fromHtml(a);
 		return null;
-		//return a.replaceAll("<(^a|^p|^\\s|^blockquote)+?>", "");
+		// return a.replaceAll("<(^a|^p|^\\s|^blockquote)+?>", "");
 	}
 }
