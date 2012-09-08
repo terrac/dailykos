@@ -1,7 +1,9 @@
 package com.kos.reader;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -11,6 +13,8 @@ public class CommentsActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_content);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	    
 		WebView tv = (WebView) findViewById(R.id.textView1);
 		String stringExtra = 
 				"<style type=\"text/css\">\n" + 
@@ -19,6 +23,8 @@ public class CommentsActivity extends Activity {
 				"</style> \n"
 				//+js
 				;
+		stringExtra=ContentActivity.ignoreImages(stringExtra, preferences);
+		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
 		stringExtra += getIntent().getStringExtra("comments");
 		Log.d("com", stringExtra);
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -65,11 +66,31 @@ public class TitlesActivity extends Activity {
         
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
 
+		getMenuInflater().inflate(R.menu.activity_content, menu);
+		return true;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (R.id.menu_comments == item.getItemId()) {
+			Intent myIntent = new Intent(TitlesActivity.this,
+					CommentsActivity.class);
+			String stringExtra = getIntent().getStringExtra("comments");
+			if (stringExtra != null) {
+				myIntent.putExtra("comments", stringExtra);
+				TitlesActivity.this.startActivity(myIntent);
+			}
+
+		}
+
+
+		if (R.id.menu_preferences == item.getItemId()) {
+			Intent myIntent = new Intent(TitlesActivity.this, PrefsFragment.class);
+			TitlesActivity.this.startActivity(myIntent);
+		}
+		return super.onOptionsItemSelected(item);
+	}
     
 }

@@ -31,6 +31,7 @@ import android.text.Html;
 import android.text.Html.TagHandler;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -95,6 +96,7 @@ public class ContentActivity extends Activity {
 							+ "> go to kos page</a>";
 				}
 				Toast toast = Toast.makeText(context, text, duration);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
 				toast.show();
 				loadData(value);
 			}
@@ -122,17 +124,25 @@ public class ContentActivity extends Activity {
 	    
 		stringExtra = css + stringExtra;
 
-		if (!preferences.getBoolean("imagesEnabled", false)) {
-			String ignore = "<style type=\"text/css\">\n" + "img\n"
-					+ "{ display: none; }\n" + "</style> ";
-			stringExtra = ignore + stringExtra;
-		}
+		stringExtra = ignoreImages(stringExtra, preferences);
 		String ignoreIFrame = "<style type=\"text/css\">\n" + "iframe\n"
 				+ "{ display: none; }\n" + "</style> ";
 		if (!preferences.getBoolean("iframeEnabled", false)) {
 			stringExtra = ignoreIFrame + stringExtra;
 		}
 		
+		stringExtra = fontSize(stringExtra, preferences);
+
+		WebView tv = (WebView) findViewById(R.id.textView1);
+
+		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
+				"text/html", "UTF-8", "about:blank");
+	}
+
+	public static String fontSize(String stringExtra, SharedPreferences preferences) {
+		if(!preferences.getBoolean("fontEnabled", false)){
+			return stringExtra;
+		}
 		int fontSize;
 		try {
 			fontSize = Integer.parseInt(preferences.getString("fontSize", "0"));
@@ -141,14 +151,19 @@ public class ContentActivity extends Activity {
 		}
 		if (fontSize != 0) {
 			String size = "<style type=\"text/css\">\n" + "body\n"
-					+ "{ font-size:" + fontSize + "em; }\n" + "</style> ";
+					+ "{ font-size:" + fontSize + "px; }\n" + "</style> ";
 			stringExtra = size + stringExtra;
 		}
+		return stringExtra;
+	}
 
-		WebView tv = (WebView) findViewById(R.id.textView1);
-
-		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
-				"text/html", "UTF-8", "about:blank");
+	public static String ignoreImages(String stringExtra, SharedPreferences preferences) {
+		if (!preferences.getBoolean("imagesEnabled", false)) {
+			String ignore = "<style type=\"text/css\">\n" + "img\n"
+					+ "{ display: none; }\n" + "</style> ";
+			stringExtra = ignore + stringExtra;
+		}
+		return stringExtra;
 	}
 
 	@Override

@@ -1,31 +1,32 @@
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-    <PreferenceCategory
-            android:title="prefs">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="prefs" >
 
         <CheckBoxPreference
-                android:key="iframeEnabled"
-                android:title="IFrame"
-                android:summary="Summary Iframe" />
+            android:key="iframeEnabled"
+            android:summary="Enable for youtube videos"
+            android:title="IFrame" />
 
         <CheckBoxPreference
-                android:key="imagesEnabled"
-                android:title="Images"
-                android:summary="Summary Images" />
-
-
-        <EditTextPreference
-                android:key="fontSize"
-                android:title="Font"
-                android:summary="Font Summary"
-                android:dialogTitle="Font"
-                android:inputType="number" 
-                android:defaultValue="0"
-                 />
-
-
+            android:key="imagesEnabled"
+            android:summary="Enable for images"
+            android:title="Images" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Font Size" >
+
+        <CheckBoxPreference
+            android:key="fontEnabled"
+            android:summary="Enable to set font size"
+            android:title="Enable setting font size" />
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:dialogTitle="Font"
+            android:inputType="number"
+            android:key="fontSize"
+            android:summary="Set your font size in pixels"
+            android:title="Font" />
+    </PreferenceCategory>
 
 </PreferenceScreen>
