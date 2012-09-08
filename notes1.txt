@@ -1,3 +1,21 @@
+1 check out comment javascript script
+2 create a preferences page with images and font size and iframesu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 notes
 1 take the data from the inital get
 2 do the same logic to grab the comments

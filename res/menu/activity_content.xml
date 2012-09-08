@@ -1,9 +1,13 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_comments"
-        android:title="Comments"
-        android:orderInCategory="100" />
-    <item android:id="@+id/menu_images" android:title="Not Showing Images" android:checked="true" android:checkable="true"></item>
-    
-    
-    
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_comments"
+        android:orderInCategory="100"
+        android:title="Comments"/>
+    <item
+        android:id="@+id/menu_preferences"
+        
+        android:title="Preferences">
+    </item>
+
 </menu>
