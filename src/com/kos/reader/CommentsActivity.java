@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -26,10 +29,15 @@ public class CommentsActivity extends Activity {
 		stringExtra=ContentActivity.ignoreImages(stringExtra, preferences);
 		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
 		stringExtra += getIntent().getStringExtra("comments");
+		stringExtra =showRecomended(stringExtra);
 		Log.d("com", stringExtra);
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
 				"text/html", "UTF-8", "about:blank");
 		
+	}
+	private String showRecomended(String stringExtra) {
+		Spanned sp=Html.fromHtml(stringExtra);
+		return stringExtra;
 	}
 	final static String js = "<style type=\\\"text/javascript\\\"    >// ==UserScript==\n" + 
 			"// @name           Daily Kos Comment Highlighter / Filters\n" + 
