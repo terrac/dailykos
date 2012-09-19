@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuCompat;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.TagHandler;
@@ -36,6 +37,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -47,6 +49,7 @@ public class ContentActivity extends Activity {
 
 	String value;
 	String initial;
+	private String error;
 
 	final public static String css = "		<script type=\"text/javascript\"><!--\n"
 			+ "		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n"
@@ -56,52 +59,87 @@ public class ContentActivity extends Activity {
 			+ "		" + "		//--></script>";
 
 	@Override
+	protected void onRestart() {
+		doInitialLoad();
+		super.onRestart();
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_content);
+		doInitialLoad();
+
+		showTutorial();
+
+	}
+
+	public void doInitialLoad() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getBoolean("showBar", true)) {
+			setContentView(R.layout.activity_content);
+
+		} else {
+			setContentView(R.layout.activity_content_no_bar);
+
+		}
 		String stringExtra = getIntent().getStringExtra("content");
 
-		Uri parcelableExtra = getIntent().getParcelableExtra("uri");
+		// getActionBar().
+		// Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
 		// stringExtra.substring(stringExtra.length()-10));
-		value = initial = stringExtra;
-		stringExtra += "<br> loading ....";
-		loadData(stringExtra);
+		if (value == null) {
+			value = initial = stringExtra;
+			stringExtra += "<br> loading ....";
+			loadData(stringExtra);
 
-		new AsyncTask<String, Void, String>() {
+			new AsyncTask<String, Void, String>() {
 
-			@Override
-			protected String doInBackground(String... params) {
-				String stringExtra = getIntent().getStringExtra("content");
+				@Override
+				protected String doInBackground(String... params) {
+					String stringExtra = getIntent().getStringExtra("content");
 
-				Uri parcelableExtra = getIntent().getParcelableExtra("uri");
-				stringExtra = ContentActivity.this.get(parcelableExtra);
-				value = stringExtra + "<a href=" + parcelableExtra
-						+ "> go to kos page</a>";
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(String result) {
-
-				Context context = getApplicationContext();
-				CharSequence text = "Loaded.";
-				int duration = Toast.LENGTH_SHORT;
-
-				if (initial.length() > value.length()) {
-					text = "Already Loaded";
 					Uri parcelableExtra = getIntent().getParcelableExtra("uri");
-
-					value = initial + "<a href=" + parcelableExtra
+					stringExtra = ContentActivity.this.get(parcelableExtra);
+					value = stringExtra + "<a href=" + parcelableExtra
 							+ "> go to kos page</a>";
+					return null;
 				}
-				Toast toast = Toast.makeText(context, text, duration);
-				toast.setGravity(Gravity.BOTTOM, 0, 0);
-				toast.show();
-				loadData(value);
-			}
-		}.execute("");
 
+				@Override
+				protected void onPostExecute(String result) {
+					if(error != null){
+						Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
+						
+						error = null;
+						return;
+					}
+					Context context = getApplicationContext();
+					CharSequence text = "Loaded.";
+					int duration = Toast.LENGTH_SHORT;
+
+					if (initial.length() > value.length()) {
+						text = "Already Loaded";
+						Uri parcelableExtra = getIntent().getParcelableExtra(
+								"uri");
+
+						value = initial + "<a href=" + parcelableExtra
+								+ "> go to kos page</a>";
+					}
+					Toast toast = Toast.makeText(context, text, duration);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+					loadData(value);
+				}
+			}.execute("");
+
+		}
+		loadData(value);
+	}
+
+	public void showTutorial() {
 		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
 		if (!preferences.getBoolean("tutorial", false)) {
 			Editor edit = preferences.edit();
@@ -112,16 +150,15 @@ public class ContentActivity extends Activity {
 					.show();
 
 		}
-
-		loadData(value);
 	}
 
 	public void loadData(String stringExtra) {
 		// if (plainText) {
 		// stringExtra = stripHtml(stringExtra);
 		// }
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
 		stringExtra = css + stringExtra;
 
 		stringExtra = ignoreImages(stringExtra, preferences);
@@ -130,7 +167,7 @@ public class ContentActivity extends Activity {
 		if (!preferences.getBoolean("iframeEnabled", false)) {
 			stringExtra = ignoreIFrame + stringExtra;
 		}
-		
+
 		stringExtra = fontSize(stringExtra, preferences);
 
 		WebView tv = (WebView) findViewById(R.id.textView1);
@@ -139,8 +176,9 @@ public class ContentActivity extends Activity {
 				"text/html", "UTF-8", "about:blank");
 	}
 
-	public static String fontSize(String stringExtra, SharedPreferences preferences) {
-		if(!preferences.getBoolean("fontEnabled", false)){
+	public static String fontSize(String stringExtra,
+			SharedPreferences preferences) {
+		if (!preferences.getBoolean("fontEnabled", false)) {
 			return stringExtra;
 		}
 		int fontSize;
@@ -157,7 +195,8 @@ public class ContentActivity extends Activity {
 		return stringExtra;
 	}
 
-	public static String ignoreImages(String stringExtra, SharedPreferences preferences) {
+	public static String ignoreImages(String stringExtra,
+			SharedPreferences preferences) {
 		if (!preferences.getBoolean("imagesEnabled", false)) {
 			String ignore = "<style type=\"text/css\">\n" + "img\n"
 					+ "{ display: none; }\n" + "</style> ";
@@ -168,29 +207,40 @@ public class ContentActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		getMenuInflater().inflate(R.menu.activity_content, menu);
+
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
 		if (R.id.menu_comments == item.getItemId()) {
-			Intent myIntent = new Intent(ContentActivity.this,
-					CommentsActivity.class);
-			String stringExtra = getIntent().getStringExtra("comments");
-			if (stringExtra != null) {
-				myIntent.putExtra("comments", stringExtra);
-				ContentActivity.this.startActivity(myIntent);
-			}
+			comments(null);
 
 		}
-
 
 		if (R.id.menu_preferences == item.getItemId()) {
-			Intent myIntent = new Intent(ContentActivity.this, PrefsFragment.class);
-			ContentActivity.this.startActivity(myIntent);
+			preferences(null);
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void preferences(View v) {
+		Intent myIntent = new Intent(ContentActivity.this, PrefsFragment.class);
+		ContentActivity.this.startActivity(myIntent);
+
+	}
+
+	public void comments(View v) {
+		Intent myIntent = new Intent(ContentActivity.this,
+				CommentsActivity.class);
+		String stringExtra = getIntent().getStringExtra("comments");
+		if (stringExtra != null) {
+			myIntent.putExtra("comments", stringExtra);
+			ContentActivity.this.startActivity(myIntent);
+		}
+
 	}
 
 	public String get(Uri uri) {
@@ -237,8 +287,8 @@ public class ContentActivity extends Activity {
 				}
 			}
 			return result.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable e) {
+			error = "Unable to load";
 		}
 		return null;
 	}
@@ -248,4 +298,5 @@ public class ContentActivity extends Activity {
 		return null;
 		// return a.replaceAll("<(^a|^p|^\\s|^blockquote)+?>", "");
 	}
+
 }

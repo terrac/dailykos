@@ -6,7 +6,9 @@ import org.mcsoxford.rss.RSSReader;
 import org.mcsoxford.rss.RSSReaderException;
 
 
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class TitlesActivity extends Activity {
 
@@ -25,8 +29,16 @@ public class TitlesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+
+        
+    }
+    @Override
+    protected void onStart() {
+    	// TODO Auto-generated method stub
+    	super.onStart();
         new AsyncTask<String, Void, String>() {
         	RSSFeed feed;
+        	boolean error;
         	@Override
         	protected String doInBackground(String... params) {
         		RSSReader reader = new RSSReader();
@@ -36,6 +48,9 @@ public class TitlesActivity extends Activity {
 				} catch (RSSReaderException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (Throwable t){
+					error=true;
+					
 				}
         					
         		return null;
@@ -43,7 +58,16 @@ public class TitlesActivity extends Activity {
         	
         	@Override
         	protected void onPostExecute(String result) {
-                	final ListView listView = (ListView) findViewById(R.id.listView1);
+        		if(error){
+        			String uri = getIntent().getStringExtra("url");
+                    String text = "Cannot currently access "+uri+" Please Check your internet connection or the tag if you have set it";
+					String title = "Error";
+					new AlertDialog.Builder(TitlesActivity.this).setTitle(title).setMessage(text).setNeutralButton("Close", null).show();
+					//
+					error=false;
+					return;
+        		}
+        		final ListView listView = (ListView) findViewById(R.id.listView1);
 
         	        listView.setAdapter(new ArrayAdapter<RSSItem>(TitlesActivity.this,  android.R.layout.simple_list_item_1, feed.getItems().toArray(new RSSItem[0])));
         			OnItemClickListener onClickListener = new OnItemClickListener() {
@@ -63,28 +87,16 @@ public class TitlesActivity extends Activity {
                 }
 		}.execute("");
 
-        
     }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
-		getMenuInflater().inflate(R.menu.activity_content, menu);
+		getMenuInflater().inflate(R.menu.activity_titles, menu);
 		return true;
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (R.id.menu_comments == item.getItemId()) {
-			Intent myIntent = new Intent(TitlesActivity.this,
-					CommentsActivity.class);
-			String stringExtra = getIntent().getStringExtra("comments");
-			if (stringExtra != null) {
-				myIntent.putExtra("comments", stringExtra);
-				TitlesActivity.this.startActivity(myIntent);
-			}
-
-		}
-
 
 		if (R.id.menu_preferences == item.getItemId()) {
 			Intent myIntent = new Intent(TitlesActivity.this, PrefsFragment.class);

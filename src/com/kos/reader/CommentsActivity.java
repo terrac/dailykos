@@ -1,6 +1,7 @@
 package com.kos.reader;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,6 +9,9 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 
 public class CommentsActivity extends Activity {
@@ -15,7 +19,16 @@ public class CommentsActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_content);
+		setContentView(R.layout.activity_content_no_bar);
+		doInitialLoad();
+		
+	}
+	@Override
+	protected void onRestart() {
+		doInitialLoad();
+		super.onRestart();
+	}
+	public void doInitialLoad() {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    
 		WebView tv = (WebView) findViewById(R.id.textView1);
@@ -33,7 +46,6 @@ public class CommentsActivity extends Activity {
 		Log.d("com", stringExtra);
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
 				"text/html", "UTF-8", "about:blank");
-		
 	}
 	private String showRecomended(String stringExtra) {
 		Spanned sp=Html.fromHtml(stringExtra);
@@ -128,4 +140,27 @@ public class CommentsActivity extends Activity {
 			"				if(defaultShowTop25)hideBelow(top25);\n" + 
 			"\n" + 
 			"}); </script>";
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+			getMenuInflater().inflate(R.menu.activity_titles, menu);
+		
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (R.id.menu_preferences == item.getItemId()) {
+			preferences(null);
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	public void preferences(View v) {
+		Intent myIntent = new Intent(CommentsActivity.this, PrefsFragment.class);
+		CommentsActivity.this.startActivity(myIntent);
+
+	}
 }
