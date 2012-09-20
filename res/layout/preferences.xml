@@ -29,4 +29,11 @@
             android:title="Font" />
     </PreferenceCategory>
 
+    <CheckBoxPreference
+        android:key="showBar"
+        android:summary="Disable to have more viewing space for content"
+        android:title="Show Content Bar" 
+        android:defaultValue="true"
+        />
+
 </PreferenceScreen>

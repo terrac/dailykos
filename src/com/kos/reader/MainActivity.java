@@ -6,18 +6,13 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.mcsoxford.rss.RSSReader;
-
-import com.kos.utils.JSONSharedPreferences;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +24,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kos.utils.JSONSharedPreferences;
+
 public class MainActivity extends Activity {
 
 	@Override
@@ -37,16 +34,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		try {
-			final ListView listView = (ListView) findViewById(R.id.listView1);
-			JSONArray ja=JSONSharedPreferences.loadJSONArray(getApplicationContext(), "main", "tags");
-			if(ja.length() == 0){
-				ja.put("Recommended");
-				ja.put("Community");
-				ja.put("Index");
-				JSONSharedPreferences.saveJSONArray(getApplicationContext(), "main", "tags", ja);
-			}
-			listView.setAdapter(new ArrayAdapter<String>(this,
-					android.R.layout.simple_list_item_1, ja.join(" ").replace("\"", "").split(" ")));
+			final ListView listView = setListView();
 			OnItemClickListener onClickListener = new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						int position, long arg3) {
@@ -59,7 +47,7 @@ public class MainActivity extends Activity {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					if(!removeNext){
+					if(removeNext){
 						removeif(listView,position);				
 //						
 						removeNext = false;
@@ -94,6 +82,21 @@ public class MainActivity extends Activity {
 
 	}
 
+	public ListView setListView() throws JSONException {
+		final ListView listView = (ListView) findViewById(R.id.listView1);
+		JSONArray ja=JSONSharedPreferences.loadJSONArray(getApplicationContext(), "main", "tags");
+		if(ja.length() == 0){
+			ja.put("Recommended");
+			ja.put("Community");
+			ja.put("Index");
+			ja.put("Rescued");
+			JSONSharedPreferences.saveJSONArray(getApplicationContext(), "main", "tags", ja);
+		}
+		listView.setAdapter(new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, ja.join(" ").replace("\"", "").split(" ")));
+		return listView;
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
@@ -106,10 +109,14 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.tag_add) {
 			
+		}
+		
+		if (item.getItemId() == R.id.tag_add) {
+			
 			LayoutInflater factory = LayoutInflater.from(this);
 			final View textEntryView = factory.inflate(
 					R.layout.alert_dialog_textentry, null);
-			new AlertDialog.Builder(MainActivity.this)
+			final Dialog alertDialog=new AlertDialog.Builder(MainActivity.this)
 					.setTitle("Add Tag")
 					.setView(textEntryView)
 					.setPositiveButton("ok",
@@ -119,10 +126,11 @@ public class MainActivity extends Activity {
 									
 									JSONArray ja;
 									try {
+										
 										ja = JSONSharedPreferences.loadJSONArray(getApplicationContext(), "main", "tags");
-										ja.put(((TextView) textEntryView).getText());
+										ja.put(((TextView) textEntryView.findViewById(R.id.alert_text_add_tag)).getText());
 										JSONSharedPreferences.saveJSONArray(getApplicationContext(), "main", "tags", ja);
-									
+										setListView();
 									} catch (JSONException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();

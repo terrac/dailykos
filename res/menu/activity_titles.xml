@@ -2,12 +2,6 @@
      android:title="ActionBar"
      
     >
-
-    <item
-        android:id="@+id/menu_comments"
-        android:orderInCategory="1"
-        android:title="Comments"
-        android:showAsAction="always" />
     <item
         android:id="@+id/menu_preferences"
         android:orderInCategory="0"
