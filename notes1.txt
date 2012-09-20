@@ -1,3 +1,16 @@
+<script>
+$("#most-popular_div").hide();
+$("#popup-user_login").hide();
+$("#footer").hide();
+$("#most-recent-short_div").hide();
+$("#fb_box").hide();
+$("li").hide();
+$("#").hide();
+$("#").hide();
+$("#").hide();
+
+</script>
+
 1 check out comment javascript script
 2 create a preferences page with images and font size and iframesu
 

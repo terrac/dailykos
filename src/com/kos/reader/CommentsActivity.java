@@ -39,7 +39,7 @@ public class CommentsActivity extends Activity {
 				"</style> \n"
 				//+js
 				;
-		stringExtra=ContentActivity.ignoreImages(stringExtra, preferences);
+		ContentActivity.ignoreImages(this, preferences);
 		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
 		stringExtra += getIntent().getStringExtra("comments");
 		stringExtra =showRecomended(stringExtra);

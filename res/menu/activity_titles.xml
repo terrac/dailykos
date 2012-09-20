@@ -6,7 +6,7 @@
         android:id="@+id/menu_preferences"
         android:orderInCategory="0"
         
-        android:title="Preferences"
-        android:showAsAction="always" />
+        android:title="Preferences" />
+    <item android:id="@+id/menu_refresh" android:title="Refresh"></item>
 
 </menu>
