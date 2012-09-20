@@ -6,13 +6,11 @@
     <item
         android:id="@+id/menu_comments"
         android:orderInCategory="1"
-        android:title="Comments"
-        android:showAsAction="always" />
+        android:title="Comments"/>
     <item
         android:id="@+id/menu_preferences"
         android:orderInCategory="0"
         
-        android:title="Preferences"
-        android:showAsAction="always" />
+        android:title="Preferences"/>
 
 </menu>

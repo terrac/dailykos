@@ -1,3 +1,18 @@
+
+<script>
+$("#most-popular_div").hide();
+$("#popup-user_login").hide();
+$("#footer").hide();
+$("#most-recent-short_div").hide();
+$("#fb_box").hide();
+$("li").hide();
+$("#").hide();
+$("#").hide();
+$("#").hide();
+
+</script>
+
+
 1 check for a setting of version
   if version is null then reset the tags
   Add an initial dialog box with recent changes (ie recent, index)

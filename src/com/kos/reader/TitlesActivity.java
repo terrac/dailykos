@@ -30,13 +30,12 @@ public class TitlesActivity extends Activity {
         setContentView(R.layout.activity_titles);
         
 
-        
+        refresh();
+
     }
-    @Override
-    protected void onStart() {
-    	// TODO Auto-generated method stub
-    	super.onStart();
-        new AsyncTask<String, Void, String>() {
+
+	private void refresh() {
+		new AsyncTask<String, Void, String>() {
         	RSSFeed feed;
         	boolean error;
         	@Override
@@ -86,8 +85,7 @@ public class TitlesActivity extends Activity {
         			
                 }
 		}.execute("");
-
-    }
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -101,6 +99,10 @@ public class TitlesActivity extends Activity {
 		if (R.id.menu_preferences == item.getItemId()) {
 			Intent myIntent = new Intent(TitlesActivity.this, PrefsFragment.class);
 			TitlesActivity.this.startActivity(myIntent);
+		}
+		
+		if (R.id.menu_refresh == item.getItemId()) {
+		refresh();
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -26,7 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuCompat;
+
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.TagHandler;
@@ -161,7 +161,7 @@ public class ContentActivity extends Activity {
 
 		stringExtra = css + stringExtra;
 
-		stringExtra = ignoreImages(stringExtra, preferences);
+		ignoreImages(this, preferences);
 		String ignoreIFrame = "<style type=\"text/css\">\n" + "iframe\n"
 				+ "{ display: none; }\n" + "</style> ";
 		if (!preferences.getBoolean("iframeEnabled", false)) {
@@ -195,14 +195,14 @@ public class ContentActivity extends Activity {
 		return stringExtra;
 	}
 
-	public static String ignoreImages(String stringExtra,
+	public static void ignoreImages(Activity a,
 			SharedPreferences preferences) {
-		if (!preferences.getBoolean("imagesEnabled", false)) {
-			String ignore = "<style type=\"text/css\">\n" + "img\n"
-					+ "{ display: none; }\n" + "</style> ";
-			stringExtra = ignore + stringExtra;
-		}
-		return stringExtra;
+		
+		WebView tv = (WebView) a.findViewById(R.id.textView1);
+		
+		tv.getSettings().setLoadsImagesAutomatically(preferences.getBoolean("imagesEnabled", false));
+		
+		
 	}
 
 	@Override
