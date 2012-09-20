@@ -2,10 +2,13 @@ package com.kos.reader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,18 +24,21 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kos.utils.JSONSharedPreferences;
 
 public class MainActivity extends Activity {
-
+	
+	String[] arr=new String[]{"http://rss.dailykos.com/dailykos/","http://www.dailykos.com/rss/tag:","http://www.dailykos.com/user/"};
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
+		
 		try {
 			final ListView listView = setListView();
 			OnItemClickListener onClickListener = new OnItemClickListener() {
@@ -41,9 +47,29 @@ public class MainActivity extends Activity {
 					String url = null;
 					
 					try {
+						
+						JSONObject jo=JSONSharedPreferences.loadJSONObject(getApplicationContext(), "main", "context");
+						jo = new JSONObject();
+						
+						if(jo.length() == 0){
+							jo = new JSONObject();
+							jo.put("recommended", arr[1]+"recommended.xml");
+							jo.put("community", arr[1]+"community.xml");
+							jo.put("rescued", arr[1]+"rescued.xml");
+							jo.put("recent", arr[0]+"diaries.xml");
+							jo.put("frontpage", arr[0]+"index.xml");
+							JSONSharedPreferences.saveJSONObject(getApplicationContext(), "main", "context", jo);
+						}
 						JSONArray ja=JSONSharedPreferences.loadJSONArray(getApplicationContext(), "main", "tags");
-						url = "http://www.dailykos.com/rss/tag:"+ja.getString(position)+".xml";
-					} catch (JSONException e) {
+						
+						String name = ja.getString(position).toLowerCase();
+						url = jo.getString(name);
+						if(url == null){
+							jo.put(name, arr[1]+name+".xml");
+							JSONSharedPreferences.saveJSONObject(getApplicationContext(), "main", "context", jo);					
+							url = jo.getString(name);			
+						}
+						} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -88,8 +114,9 @@ public class MainActivity extends Activity {
 		if(ja.length() == 0){
 			ja.put("Recommended");
 			ja.put("Community");
-			ja.put("Index");
+			ja.put("Frontpage");
 			ja.put("Rescued");
+			ja.put("Recent");
 			JSONSharedPreferences.saveJSONArray(getApplicationContext(), "main", "tags", ja);
 		}
 		listView.setAdapter(new ArrayAdapter<String>(this,
@@ -116,6 +143,12 @@ public class MainActivity extends Activity {
 			LayoutInflater factory = LayoutInflater.from(this);
 			final View textEntryView = factory.inflate(
 					R.layout.alert_dialog_textentry, null);
+			Spinner spinner = (Spinner) textEntryView.findViewById(R.id.rss_choices);
+			ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+			        R.array.rss_types, android.R.layout.simple_spinner_item);
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(adapter);
+			
 			final Dialog alertDialog=new AlertDialog.Builder(MainActivity.this)
 					.setTitle("Add Tag")
 					.setView(textEntryView)
@@ -128,9 +161,16 @@ public class MainActivity extends Activity {
 									try {
 										
 										ja = JSONSharedPreferences.loadJSONArray(getApplicationContext(), "main", "tags");
-										ja.put(((TextView) textEntryView.findViewById(R.id.alert_text_add_tag)).getText());
+										CharSequence text = ((TextView) textEntryView.findViewById(R.id.alert_text_add_tag)).getText();
+										ja.put(text);
 										JSONSharedPreferences.saveJSONArray(getApplicationContext(), "main", "tags", ja);
-										setListView();
+										
+										JSONObject jo=JSONSharedPreferences.loadJSONObject(getApplicationContext(), "main", "context");
+										Spinner spinner = (Spinner) textEntryView.findViewById(R.id.rss_choices);
+										jo.put(text.toString(), arr[spinner.getSelectedItemPosition()
+																	]+"index.xml");
+										JSONSharedPreferences.saveJSONObject(getApplicationContext(), "main", "context", jo);
+									setListView();
 									} catch (JSONException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
@@ -178,5 +218,12 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void runMini(View view){
+		Intent myIntent = new Intent(MainActivity.this,
+				DiariesActivity.class);
+		MainActivity.this.startActivity(myIntent);
+
 	}
 }

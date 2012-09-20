@@ -49,19 +49,19 @@ public class DiariesActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_content_no_bar);
 		WebView tv = (WebView) findViewById(R.id.textView1);
 
-		String ignoreExtra = "<script type=\\\"text/javascript\\\">" +
-				"$(\".collapsable\").hide()" +
-				"</script>";
+		String ignoreExtra = "<script type=text/javascript>"
+				+ "$('.collapsor').hide()" + "</script>";
 		String data = get(Uri.parse("http://www.dailykos.com/diaries"));
 
-		data = ignoreExtra+data;
+		data = ignoreExtra + data;
 		tv.loadDataWithBaseURL("http://www.dailykos.com", data, "text/html",
 				"UTF-8", "about:blank");
 
-		super.onCreate(savedInstanceState);
 	}
 
 	String error;
@@ -73,44 +73,17 @@ public class DiariesActivity extends Activity {
 			HttpGet httpGet = new HttpGet("" + uri);
 			HttpResponse response = httpClient.execute(httpGet, localContext);
 			StringBuffer result = new StringBuffer();
-			StringBuffer comments = new StringBuffer();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					response.getEntity().getContent()));
 
 			String line = null;
-			int count = 0;
 			while ((line = reader.readLine()) != null) {
-				if (count > 2) {
+				result.append(line + "\n");
 
-					if (line.contains("<li id=\"c2\">")) {
-						count = 4;
-					}
-					if (count == 4) {
-						// Log.d("content", line);
-						comments.append(line + "\n");
-					}
-					if (line.contains("<li id=\"eP\">")) {
-						this.getIntent().putExtra("comments",
-								comments.toString());
-						break;
-					}
-				}
-
-				if (count > 0 && count < 3) {
-					// Log.d("content", line);
-					result.append(line + "\n");
-					if (line.contains("</div>")) {
-						count++;
-
-					}
-				} else {
-					if (line.contains("<div id=\"intro\">")) {
-						count = 1;
-					}
-				}
 			}
 			return result.toString();
 		} catch (Throwable e) {
+			e.printStackTrace();
 			error = "Unable to load";
 		}
 		return null;

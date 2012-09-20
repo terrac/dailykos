@@ -1,3 +1,48 @@
+1 check for a setting of version
+  if version is null then reset the tags
+  Add an initial dialog box with recent changes (ie recent, index)
+  describe the product, put fresh images up
+  
+
+
+1 save the exact url
+2 save the tag names
+3 alter the url until success or complete failure
+
+Create a map of tags to url indexes
+Make errors try alternatives and set the appropriate index (tag,main,users)
+do basics
+
+1 javascript that hides all collapsed panels, fbConnectWidgetHeaderTitle
+(include script to ignore images)
+
+1 write some javascript that hides the extra into buttons to show or hide and add it  
+2 browse the website
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1 screenshot the new tag thing
+2 test the tag thing
+3 mention the preferences and comments addition to 
+4 do the comment rating filter thing in javascript
+
+
+
+
+
+
 1 check out comment javascript script
 2 create a preferences page with images and font size and iframesu
 
