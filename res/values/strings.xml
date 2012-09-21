@@ -4,5 +4,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Simple Dailykos Reader</string>
+    <string name="strip_script"><script>$("#most-popular_div").hide();
+$("#popup-user_login").hide();
+$("#footer").hide();
+$("#most-recent-short_div").hide();
+$("#fb_box").hide();</script></string>
 
 </resources>

@@ -22,12 +22,10 @@ public class DiariesActivity extends Activity {
 		setContentView(R.layout.activity_content_no_bar);
 		WebView tv = (WebView) findViewById(R.id.textView1);
 
-		String ignoreExtra = "<script type=\\\"text/javascript\\\">" +
-				"$(\".articlesa \").hide()" +
-				"</script>";
+
 		String data = get(Uri.parse("http://www.dailykos.com/diaries"));
 
-		data = data+ignoreExtra;
+		data = data+R.string.strip_script;
 		tv.loadDataWithBaseURL("http://www.dailykos.com", data, "text/html",
 				"UTF-8", "about:blank");
 
