@@ -2,7 +2,6 @@
 
 
     <string-array name="rss_types">
-        <item>Main</item>
         <item>Tag</item>
         <item>User</item>
     </string-array>

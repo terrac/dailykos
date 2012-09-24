@@ -32,13 +32,7 @@ public class CommentsActivity extends Activity {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    
 		WebView tv = (WebView) findViewById(R.id.textView1);
-		String stringExtra = 
-				"<style type=\"text/css\">\n" + 
-				"div.crs\n" + 
-				"{ display: none; }\n"+ 
-				"</style> \n"
-				//+js
-				;
+		String stringExtra = getResources().getString(R.string.comment_script);
 		ContentActivity.ignoreImages(this, preferences);
 		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
 		stringExtra += getIntent().getStringExtra("comments");

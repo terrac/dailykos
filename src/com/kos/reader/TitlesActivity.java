@@ -38,14 +38,19 @@ public class TitlesActivity extends Activity {
 		new AsyncTask<String, Void, String>() {
         	RSSFeed feed;
         	boolean error;
+        	
+        	protected void onPreExecute() {};
         	@Override
         	protected String doInBackground(String... params) {
         		RSSReader reader = new RSSReader();
                 String uri = getIntent().getStringExtra("url");
                 try {
 					feed = reader.load(uri);
+					if(feed == null){
+						error= true;
+					}
 				} catch (RSSReaderException e) {
-					// TODO Auto-generated catch block
+					error=true;
 					e.printStackTrace();
 				} catch (Throwable t){
 					error=true;
