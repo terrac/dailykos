@@ -10,7 +10,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         tools:listfooter="@layout/footer"
-        tools:listitem="@android:layout/simple_list_item_1" >
+        tools:listitem="@android:layout/simple_list_item_2"
+        android:dividerHeight="2dp"
+         >
 		
     </ListView>
 

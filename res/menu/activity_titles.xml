@@ -1,12 +1,13 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" 
-     android:title="ActionBar"
-     
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="ActionBar" >
+
     <item
         android:id="@+id/menu_preferences"
         android:orderInCategory="0"
-        
-        android:title="Preferences" />
-    <item android:id="@+id/menu_refresh" android:title="Refresh"></item>
+        android:title="Preferences"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="Refresh">
+    </item>
 
 </menu>

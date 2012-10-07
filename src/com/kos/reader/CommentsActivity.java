@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 public class CommentsActivity extends Activity {
@@ -21,125 +22,71 @@ public class CommentsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_content_no_bar);
 		doInitialLoad();
-		
+
 	}
+
 	@Override
 	protected void onRestart() {
 		doInitialLoad();
 		super.onRestart();
 	}
+
 	public void doInitialLoad() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
 		WebView tv = (WebView) findViewById(R.id.textView1);
-		String stringExtra = getResources().getString(R.string.comment_script);
+		tv.setWebChromeClient(new WebChromeClient());
+		tv.getSettings().setJavaScriptEnabled(true);
+		
+		String stringExtra = "";
+
 		ContentActivity.ignoreImages(this, preferences);
 		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
+
 		stringExtra += getIntent().getStringExtra("comments");
-		stringExtra =showRecomended(stringExtra);
+		stringExtra = showRecomended(stringExtra, preferences);
+
 		Log.d("com", stringExtra);
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
 				"text/html", "UTF-8", "about:blank");
+
 	}
-	private String showRecomended(String stringExtra) {
-		Spanned sp=Html.fromHtml(stringExtra);
+
+	private String showRecomended(String stringExtra,
+			SharedPreferences preferences) {
+
+		// String string = getResources().getString(R.string.comment_script);
+		String a = "<script src=https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js></script>"
+				+ addScript(scr);
+		stringExtra = a.replace("numberOfRecommends",
+				preferences.getString("recommendsHide", "0"))
+				+ stringExtra+addScript(hideRecs);
+
 		return stringExtra;
 	}
-	final static String js = "<style type=\\\"text/javascript\\\"    >// ==UserScript==\n" + 
-			"// @name           Daily Kos Comment Highlighter / Filters\n" + 
-			"// @namespace      gmonkeyfilter\n" + 
-			"// @description    Highlights/Filters comments on Daily Kos stories\n" + 
-			"// @include        http://www.dailykos.com/story/*\n" + 
-			"// @require	  http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js\n" + 
-			"// ==/UserScript==\n" + 
-			"\n" + 
-			"var defaultShowTop25=false;\n" + 
-			"var defaultShowTop10=false;\n" + 
-			"var defaultShowTop5=false;\n" + 
-			"\n" + 
-			"var $=window.jQuery;\n" + 
-			"window.jQuery.noConflict();\n" + 
-			"$(document).ready(function(){\n" + 
-			"\n" + 
-			"        var arRecs=new Array();\n" + 
-			"				$(\".cx span a\").each(function(){\n" + 
-			"        var recs=$(this).text().split('+')[0];\n" + 
-			"        arRecs.push(parseInt(recs));\n" + 
-			"				});\n" + 
-			"        arRecs.sort(function (a, b) {return a - b;});\n" + 
-			"        var top25=arRecs[Math.floor(arRecs.length*.75)]\n" + 
-			"        var top10=arRecs[Math.floor(arRecs.length*.9)]\n" + 
-			"        var top5=arRecs[Math.floor(arRecs.length*.95)]\n" + 
-			"        var top2=arRecs[Math.floor(arRecs.length*.98)]\n" + 
-			"        \n" + 
-			"        $(\".cx span a\").each(function(){\n" + 
-			"        var recs=$(this).text().split('+')[0];\n" + 
-			"        var numrecs=parseInt(recs);\n" + 
-			"          var newbgcolor='';\n" + 
-			"          if(numrecs>=top25)newbgcolor='#FFFFcc';\n" + 
-			"          if(numrecs>=top10)newbgcolor='#FFFF99';\n" + 
-			"          if(numrecs>=top5)newbgcolor='#FFFF66';\n" + 
-			"          if(numrecs>=top2)newbgcolor='#FFDD66';\n" + 
-			"          if(newbgcolor!=''){\n" + 
-			"            $(this).parents(\"div.cx\").css({backgroundColor: newbgcolor});\n" + 
-			"            }\n" + 
-			"        });\n" + 
-			"\n" + 
-			"        //add filter links to top of comments section\n" + 
-			"        function hideBelow(threshold,showprompt){\n" + 
-			"           \n" + 
-			"						$(\".cx span a\").each(function(){\n" + 
-			"        			var recs=$(this).text().split('+')[0];\n" + 
-			"        			var numrecs=parseInt(recs);\n" + 
-			"        			if(numrecs<threshold){\n" + 
-			"								$(this).parents(\"div.cx\").hide();\n" + 
-			"							}\n" + 
-			"						})\n" + 
-			"						$(\"#filterstatusdiv\").html(\"*Filtered*\");\n" + 
-			"				}\n" + 
-			"        var filterlink=document.createElement(\"a\");\n" + 
-			"        filterlink.href=\"javascript:void(0)\";\n" + 
-			"        $(\"#cDForm\").append(filterlink);\n" + 
-			"        $(filterlink).click(function(){hideBelow(top25,true)});\n" + 
-			"        $(filterlink).html(\"Top 25% \");\n" + 
-			"        \n" + 
-			"        filterlink=document.createElement(\"a\");\n" + 
-			"        filterlink.href=\"javascript:void(0)\";\n" + 
-			"        $(\"#cDForm\").append(filterlink);\n" + 
-			"        $(filterlink).click(function(){hideBelow(top10,true)});\n" + 
-			"        $(filterlink).html(\"Top 10% \");\n" + 
-			"        \n" + 
-			"        filterlink=document.createElement(\"a\");\n" + 
-			"        filterlink.href=\"javascript:void(0)\";\n" + 
-			"        $(\"#cDForm\").append(filterlink);\n" + 
-			"        $(filterlink).click(function(){hideBelow(top5,true)});\n" + 
-			"        $(filterlink).html(\"Top 5% \");\n" + 
-			"\n" + 
-			"        filterlink=document.createElement(\"a\");\n" + 
-			"        filterlink.href=\"javascript:void(0)\";\n" + 
-			"        $(\"#cDForm\").append(filterlink);\n" + 
-			"        $(filterlink).click(function(){$(\".cx span a\").each(function(){\n" + 
-			"	         $(this).parents(\"div.cx\").show();\n" + 
-			"				})\n" + 
-			"				$(\"#filterstatusdiv\").html(\"\");\n" + 
-			"				});\n" + 
-			"        $(filterlink).html(\"Show All \");\n" + 
-			"        \n" + 
-			"        filterstatusdiv=document.createElement(\"div\");\n" + 
-			"        filterstatusdiv.id=\"filterstatusdiv\";\n" + 
-			"        $(\"#cDForm\").append(filterstatusdiv);\n" + 
-			"				\n" + 
-			"				if(defaultShowTop5)hideBelow(top5);\n" + 
-			"				if(defaultShowTop10)hideBelow(top10);\n" + 
-			"				if(defaultShowTop25)hideBelow(top25);\n" + 
-			"\n" + 
-			"}); </script>";
+
+	String scr = "var i = numberOfRecommends;\r\n"
+			+ "if(i != 0){\r\n"
+			+ "\r\n"
+			+ "document.write(\"<input type=button value='togglecomments below numberOfRecommends recommends' onclick=toggleComments()></input>\")\r\n"
+			+ "\r\n" + "}\r\n" + "function toggleComments(){\r\n"
+			+ "	$(\".cx\").each(function() {\r\n"
+			+ "		 if(i >$(this).find(\".crs\").find(\"a\").length){\r\n"
+			+ "	    	$(this).toggle();\r\n" + "	    }\r\n" + "	    \r\n"
+			+ "	});\r\n" + "	}\r\n" ;
+
 	
-	
+	String hideRecs = "$('.crs').hide();";
+
+	public static String addScript(String string) {
+		return "<script>" + string + "</script>";
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-			getMenuInflater().inflate(R.menu.activity_titles, menu);
-		
+		getMenuInflater().inflate(R.menu.activity_titles, menu);
+
 		return true;
 	}
 

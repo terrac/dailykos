@@ -30,10 +30,23 @@
     </PreferenceCategory>
 
     <CheckBoxPreference
+        android:defaultValue="true"
         android:key="showBar"
         android:summary="Disable to have more viewing space for content"
-        android:title="Show Content Bar" 
+        android:title="Show Content Bar" />
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:dialogTitle="Number of Recommends"
+        android:inputType="number"
+        android:key="recommendsHide"
+        android:summary="Hide comments that have a low number of recommends"
+        android:title="Number of Recommends" />
+
+    <CheckBoxPreference
         android:defaultValue="true"
-        />
+        android:key="displayAd"
+        android:summary="Do you want to display an ad on the main page?"
+        android:title="Display Ads" />
 
 </PreferenceScreen>

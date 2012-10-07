@@ -25,7 +25,7 @@ public class DiariesActivity extends Activity {
 
 		String data = get(Uri.parse("http://www.dailykos.com/diaries"));
 
-		data = data+R.string.strip_script;
+		data = data+CommentsActivity.addScript(getResources().getString(R.string.strip_script));
 		tv.loadDataWithBaseURL("http://www.dailykos.com", data, "text/html",
 				"UTF-8", "about:blank");
 

@@ -11,6 +11,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.xml.sax.XMLReader;
 
 import android.app.Activity;
@@ -50,7 +53,6 @@ public class ContentActivity extends Activity {
 	String value;
 	String initial;
 	private String error;
-
 	final public static String css = "		<script type=\"text/javascript\"><!--\n"
 			+ "		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n"
 			+ "	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
@@ -58,21 +60,19 @@ public class ContentActivity extends Activity {
 			+ "	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n"
 			+ "		" + "		//--></script>";
 
-	@Override
-	protected void onRestart() {
-		doInitialLoad();
-		super.onRestart();
-	}
+	
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onStart() {
 		doInitialLoad();
-
-		showTutorial();
-
+		super.onStart();
 	}
-
+//	@Override
+//	public void onCreate(Bundle savedInstanceState) {
+//		super.onCreate(savedInstanceState);
+//		doInitialLoad();
+//	}
+	
 	public void doInitialLoad() {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -85,13 +85,14 @@ public class ContentActivity extends Activity {
 
 		}
 		String stringExtra = getIntent().getStringExtra("content");
-
 		// getActionBar().
 		// Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
 		// stringExtra.substring(stringExtra.length()-10));
+		
 		if (value == null) {
-			value = initial = stringExtra;
+			
+			value= initial = stringExtra;
 			stringExtra += "<br> loading ....";
 			loadData(stringExtra);
 
@@ -102,7 +103,22 @@ public class ContentActivity extends Activity {
 					String stringExtra = getIntent().getStringExtra("content");
 
 					Uri parcelableExtra = getIntent().getParcelableExtra("uri");
-					stringExtra = ContentActivity.this.get(parcelableExtra);
+					
+					try {
+						Document doc = Jsoup.connect(parcelableExtra.toString()).get();
+						stringExtra =doc.getElementById("body").toString();
+						stringExtra =doc.getElementsByClass("article-body").get(0).toString();
+						Element comments = doc.getElementById("comments");
+						
+						comments.getElementById("eP").remove();
+						comments.getElementById("e").remove();
+						getIntent().putExtra("comments", comments.toString());
+					} catch (IOException e) {
+						error = "Unable to load";
+						
+					}
+
+					//stringExtra = ContentActivity.this.get(parcelableExtra);
 					value = stringExtra + "<a href=" + parcelableExtra
 							+ "> go to kos page</a>";
 					return null;
@@ -110,6 +126,7 @@ public class ContentActivity extends Activity {
 
 				@Override
 				protected void onPostExecute(String result) {
+					
 					if(error != null){
 						Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
 						
@@ -132,9 +149,11 @@ public class ContentActivity extends Activity {
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
 					loadData(value);
+					
+					
 				}
 			}.execute("");
-
+			return;
 		}
 		loadData(value);
 	}
@@ -239,64 +258,80 @@ public class ContentActivity extends Activity {
 		if (stringExtra != null) {
 			myIntent.putExtra("comments", stringExtra);
 			ContentActivity.this.startActivity(myIntent);
+		} else {
+			Toast.makeText(getApplicationContext(),"Not Loaded Yet", Toast.LENGTH_SHORT).show();
+			
 		}
 
 	}
 
-	public String get(Uri uri) {
-		try {
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpContext localContext = new BasicHttpContext();
-			HttpGet httpGet = new HttpGet("" + uri);
-			HttpResponse response = httpClient.execute(httpGet, localContext);
-			StringBuffer result = new StringBuffer();
-			StringBuffer comments = new StringBuffer();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()));
-
-			String line = null;
-			int count = 0;
-			while ((line = reader.readLine()) != null) {
-				if (count > 2) {
-
-					if (line.contains("<li id=\"c2\">")) {
-						count = 4;
-					}
-					if (count == 4) {
-						// Log.d("content", line);
-						comments.append(line + "\n");
-					}
-					if (line.contains("<li id=\"eP\">")) {
-						this.getIntent().putExtra("comments",
-								comments.toString());
-						break;
-					}
-				}
-
-				if (count > 0 && count < 3) {
-					// Log.d("content", line);
-					result.append(line + "\n");
-					if (line.contains("</div>")) {
-						count++;
-
-					}
-				} else {
-					if (line.contains("<div id=\"intro\">")) {
-						count = 1;
-					}
-				}
-			}
-			return result.toString();
-		} catch (Throwable e) {
-			error = "Unable to load";
-		}
-		return null;
-	}
+//	public String get(Uri uri) {
+//		try {
+//			HttpClient httpClient = new DefaultHttpClient();
+//			HttpContext localContext = new BasicHttpContext();
+//			HttpGet httpGet = new HttpGet("" + uri);
+//			HttpResponse response = httpClient.execute(httpGet, localContext);
+//			StringBuffer result = new StringBuffer();
+//			StringBuffer comments = new StringBuffer();
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(
+//					response.getEntity().getContent()));
+//
+//			String line = null;
+//			int count = 0;
+//			while ((line = reader.readLine()) != null) {
+//				if (count > 2) {
+//
+//					if (line.contains("<li id=\"c2\">")) {
+//						count = 4;
+//					}
+//					if (count == 4) {
+//						// Log.d("content", line);
+//						comments.append(line + "\n");
+//					}
+//					if (line.contains("<li id=\"eP\">")) {
+//						this.getIntent().putExtra("comments",
+//								comments.toString());
+//						break;
+//					}
+//				}
+//
+//				if (count > 0 && count < 3) {
+//					// Log.d("content", line);
+//					result.append(line + "\n");
+//					if (line.contains("</div>")) {
+//						count++;
+//
+//					}
+//				} else {
+//					if (line.contains("<div id=\"intro\">")) {
+//						count = 1;
+//					}
+//				}
+//			}
+//			return result.toString();
+//		} catch (Throwable e) {
+//			error = "Unable to load";
+//		}
+//		return null;
+//	}
 
 	public String stripHtml(String a) {
 		Html.fromHtml(a);
 		return null;
 		// return a.replaceAll("<(^a|^p|^\\s|^blockquote)+?>", "");
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putString("value", value);
+		
+		super.onSaveInstanceState(outState);
+	}
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		value = savedInstanceState.getString("value");
+		
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 }

@@ -3,8 +3,10 @@ package com.kos.reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,18 +22,25 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings.Secure;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 import com.kos.utils.JSONSharedPreferences;
 
 public class MainActivity extends Activity {
@@ -43,10 +52,12 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		CookieSyncManager.createInstance(getApplicationContext());
+		CookieSyncManager.getInstance().startSync();
 		setContentView(R.layout.activity_main);
 
 		checkVersion();
-
+		displayAddQuestion();
 		try {
 			final ListView listView = setListView();
 			OnItemClickListener onClickListener = new OnItemClickListener() {
@@ -206,9 +217,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.tag_add) {
 
-		}
 
 		if (item.getItemId() == R.id.tag_add) {
 
@@ -317,9 +326,7 @@ public class MainActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
-		if (item.getItemId() == R.id.browser) {
-			runMini(null);
-		}
+		
 		return super.onOptionsItemSelected(item);
 
 	}
@@ -357,6 +364,34 @@ public class MainActivity extends Activity {
 	public void runMini(View view) {
 		Intent myIntent = new Intent(MainActivity.this, DiariesActivity.class);
 		MainActivity.this.startActivity(myIntent);
+
+	}
+
+	Set<String> adWords = new HashSet<String>();
+	{
+		adWords.add("Obama");
+		adWords.add("politics");
+	}
+
+	public void displayAddQuestion() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		// ad
+
+		if (!preferences.getBoolean(("displayAd"), true)) {
+			((AdView)findViewById(R.id.adView)).
+			findViewById(R.id.adView).setVisibility(View.GONE);
+		}
+		// AdView adView = new AdView(this, AdSize.BANNER, "a9876sf98dfg");
+		// RelativeLayout layout = (RelativeLayout) findViewById(R.id.ad);
+		// layout.addView(adView);
+		// AdRequest request = new AdRequest();
+		// request.setKeywords(adWords);
+		// adView.loadAd(request);
+
+		// return;
+		// }
 
 	}
 }
