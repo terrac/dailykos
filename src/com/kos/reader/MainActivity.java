@@ -380,18 +380,9 @@ public class MainActivity extends Activity {
 		// ad
 
 		if (!preferences.getBoolean(("displayAd"), true)) {
-			((AdView)findViewById(R.id.adView)).
+			
 			findViewById(R.id.adView).setVisibility(View.GONE);
 		}
-		// AdView adView = new AdView(this, AdSize.BANNER, "a9876sf98dfg");
-		// RelativeLayout layout = (RelativeLayout) findViewById(R.id.ad);
-		// layout.addView(adView);
-		// AdRequest request = new AdRequest();
-		// request.setKeywords(adWords);
-		// adView.loadAd(request);
-
-		// return;
-		// }
 
 	}
 }
