@@ -1,9 +1,9 @@
 <resources>
 
-    <string name="app_name">Simple Dailykos Reader</string>
+    <string name="app_name">Dailykos Reader</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">Simple Dailykos Reader</string>
+    <string name="title_activity_main">Dailykos Reader</string>
     <string name="strip_script">$("#header").hide();
 $("#sub").hide();
 $("#footer").hide();
