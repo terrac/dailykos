@@ -5,15 +5,11 @@ import org.mcsoxford.rss.RSSItem;
 import org.mcsoxford.rss.RSSReader;
 import org.mcsoxford.rss.RSSReaderException;
 
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,25 +17,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class TitlesActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
-		// ad
-		setContentView(R.layout.activity_titles);
+        setContentView(R.layout.activity_titles);
         
-		if (!preferences.getBoolean(("displayAd"), true)) {
-			findViewById(R.id.adView).setVisibility(View.GONE);
-		}
-        
+
         refresh();
 
     }
@@ -121,4 +107,5 @@ public class TitlesActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+    
 }

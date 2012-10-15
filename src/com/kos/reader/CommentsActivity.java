@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +36,12 @@ public class CommentsActivity extends Activity {
 		tv.setWebChromeClient(new WebChromeClient());
 		tv.getSettings().setJavaScriptEnabled(true);
 		
-		String stringExtra = "";
+		String stringExtra = "<style type=\"text/css\">"
+			+ "A:link {text-decoration: none; color: orange;}"
+			+ "A:visited {text-decoration: none; color: #654B0F;}"
+			+ "A:active {text-decoration: none; color: orange;}"
+			+ "A:hover {text-decoration: underline; color: #654B0F;}"
+			+ "</style>";
 
 		ContentActivity.ignoreImages(this, preferences);
 		stringExtra = ContentActivity.fontSize(stringExtra, preferences);

@@ -41,12 +41,12 @@ public class DiariesActivity extends Activity {
 			HttpGet httpGet = new HttpGet("" + uri);
 			HttpResponse response = httpClient.execute(httpGet, localContext);
 			StringBuffer result = new StringBuffer();
-			StringBuffer comments = new StringBuffer();
+			//StringBuffer comments = new StringBuffer();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					response.getEntity().getContent()));
 
 			String line = null;
-			int count = 0;
+			//int count = 0;
 			while ((line = reader.readLine()) != null) {
 					result.append(line + "\n");
 			}

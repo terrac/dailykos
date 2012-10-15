@@ -1,51 +1,28 @@
 package com.kos.reader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.xml.sax.XMLReader;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-
-import android.text.Editable;
 import android.text.Html;
-import android.text.Html.TagHandler;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.webkit.WebView;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class ContentActivity extends Activity {
@@ -58,7 +35,13 @@ public class ContentActivity extends Activity {
 			+ "	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
 			+ "	<!-- can this be unified? -->\n"
 			+ "	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n"
-			+ "		" + "		//--></script>";
+			+ "		" + "		//--></script>"
+			+ "<style type=\"text/css\">"
+			+ "A:link {text-decoration: none; color: orange;}"
+			+ "A:visited {text-decoration: none; color: #654B0F;}"
+			+ "A:active {text-decoration: none; color: orange;}"
+			+ "A:hover {text-decoration: underline; color: #654B0F;}"
+			+ "</style>";
 
 	
 
@@ -85,6 +68,10 @@ public class ContentActivity extends Activity {
 
 		}
 		String stringExtra = getIntent().getStringExtra("content");
+		WebView tv = (WebView) findViewById(R.id.textView1);
+		//These two settings scale the page to the screen
+		//tv.getSettings().setSupportZoom( true ); //Modify this 
+		//tv.getSettings().setDefaultZoom(WebSettings.ZoomDensity.FAR);//Add this
 		// getActionBar().
 		// Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
@@ -94,7 +81,7 @@ public class ContentActivity extends Activity {
 			
 			value= initial = stringExtra;
 			stringExtra += "<br> loading ....";
-			loadData(stringExtra);
+			loadData(tv, stringExtra, 0);
 
 			new AsyncTask<String, Void, String>() {
 
@@ -148,14 +135,17 @@ public class ContentActivity extends Activity {
 					Toast toast = Toast.makeText(context, text, duration);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
-					loadData(value);
+					
+					// Get the current WebView position
+					WebView tv = (WebView) findViewById(R.id.textView1);
+					loadData(tv, value, tv.getScrollY());
 					
 					
 				}
 			}.execute("");
 			return;
 		}
-		loadData(value);
+		loadData(tv, value, 0);
 	}
 
 	public void showTutorial() {
@@ -171,7 +161,7 @@ public class ContentActivity extends Activity {
 		}
 	}
 
-	public void loadData(String stringExtra) {
+	public void loadData(WebView tv, String stringExtra, int yPos) {
 		// if (plainText) {
 		// stringExtra = stripHtml(stringExtra);
 		// }
@@ -189,8 +179,9 @@ public class ContentActivity extends Activity {
 
 		stringExtra = fontSize(stringExtra, preferences);
 
-		WebView tv = (WebView) findViewById(R.id.textView1);
-
+		// ScrollY is only available in ICS or later
+		setScrollYPos(tv, yPos);
+		
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
 				"text/html", "UTF-8", "about:blank");
 	}
@@ -332,6 +323,13 @@ public class ContentActivity extends Activity {
 		value = savedInstanceState.getString("value");
 		
 		super.onRestoreInstanceState(savedInstanceState);
+	}
+	
+	@TargetApi(14)
+	private void setScrollYPos(WebView tv, int yPos){
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+			tv.setScrollY(yPos);
+		}
 	}
 
 }

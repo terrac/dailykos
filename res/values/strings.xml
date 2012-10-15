@@ -8,9 +8,13 @@
 $("#sub").hide();
 $("#footer").hide();
 </string>
-<string name="comment_script">
+	<string name="comment_script">
     
 
 </string>
+
+	<string name="text_preferences">Preferences</string>
+	<string name="text_comments">Comments</string>
+	<string name="text_button">Button</string>
     
 </resources>

@@ -2,10 +2,8 @@ package com.kos.reader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -20,10 +18,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings.Secure;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,13 +29,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
 import com.google.ads.AdView;
 import com.kos.utils.JSONSharedPreferences;
 
@@ -380,9 +373,18 @@ public class MainActivity extends Activity {
 		// ad
 
 		if (!preferences.getBoolean(("displayAd"), true)) {
-			
+			((AdView)findViewById(R.id.adView)).
 			findViewById(R.id.adView).setVisibility(View.GONE);
 		}
+		// AdView adView = new AdView(this, AdSize.BANNER, "a9876sf98dfg");
+		// RelativeLayout layout = (RelativeLayout) findViewById(R.id.ad);
+		// layout.addView(adView);
+		// AdRequest request = new AdRequest();
+		// request.setKeywords(adWords);
+		// adView.loadAd(request);
+
+		// return;
+		// }
 
 	}
 }
