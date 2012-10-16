@@ -53,6 +53,7 @@ public class ContentActivity extends Activity {
 	String value;
 	String initial;
 	private String error;
+	private AsyncTask<String, Void, String> atask;
 	final public static String css = "		<script type=\"text/javascript\"><!--\n"
 			+ "		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n"
 			+ "	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
@@ -96,7 +97,7 @@ public class ContentActivity extends Activity {
 			stringExtra += "<br> loading ....";
 			loadData(stringExtra);
 
-			new AsyncTask<String, Void, String>() {
+			atask =new AsyncTask<String, Void, String>() {
 
 				@Override
 				protected String doInBackground(String... params) {
@@ -145,6 +146,7 @@ public class ContentActivity extends Activity {
 						value = initial + "<a href=" + parcelableExtra
 								+ "> go to kos page</a>";
 					}
+					
 					Toast toast = Toast.makeText(context, text, duration);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
@@ -334,4 +336,12 @@ public class ContentActivity extends Activity {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
+	
+	protected void onStop() {
+		if(atask != null){
+			atask.cancel(true);
+				
+		}
+		
+	};
 }
