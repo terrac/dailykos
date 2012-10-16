@@ -10,6 +10,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="14dp"
-        android:text="Button" />
+        android:text="@string/text_button" />
 
 </RelativeLayout>

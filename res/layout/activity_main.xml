@@ -23,6 +23,6 @@
       ads:adSize="BANNER"
       ads:adUnitId="a15067a5e3f3f4c"
       ads:loadAdOnCreate="true"
-      ads:testDevices="TEST_EMULATOR, CF95DC53F383F9A836FD749F3EF439CD" />
+      ads:testDevices="TEST_EMULATOR, CF95DC53F383F9A836FD749F3EF439CD, 3A14F4B7A1E04CA2AFED85634D7A26F6" />
 
 </RelativeLayout>

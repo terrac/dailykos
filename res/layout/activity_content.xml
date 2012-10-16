@@ -5,8 +5,8 @@
 
     <WebView
         android:id="@+id/textView1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_marginBottom="50dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="preferences"
-            android:text="Preferences" />
+            android:text="@string/text_preferences" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="comments"
-            android:text="Comments" />
+            android:text="@string/text_comments" />
     </LinearLayout>
 
 </FrameLayout>
