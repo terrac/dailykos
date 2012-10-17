@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -30,12 +31,14 @@ public class ContentActivity extends Activity {
 	String value;
 	String initial;
 	private String error;
+	private AsyncTask<String, Void, String> atask;
 	final public static String css = "		<script type=\"text/javascript\"><!--\n"
 			+ "		  document.write('<link href=\"/c/enhanced.css\" rel=\"stylesheet\" media=\"screen, projection\" type=\"text/css\" />');\n"
 			+ "	<link href=\"/c/unified.css?rev=46\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
 			+ "	<!-- can this be unified? -->\n"
 			+ "	<link href=\"/c/print.css\" rel=\"stylesheet\" media=\"print\" type=\"text/css\" />\n"
-			+ "		" + "		//--></script>"
+			+ "		"
+			+ "		//--></script>"
 			+ "<style type=\"text/css\">"
 			+ "A:link {text-decoration: none; color: orange;}"
 			+ "A:visited {text-decoration: none; color: #654B0F;}"
@@ -43,19 +46,18 @@ public class ContentActivity extends Activity {
 			+ "A:hover {text-decoration: underline; color: #654B0F;}"
 			+ "</style>";
 
-	
-
 	@Override
 	protected void onStart() {
 		doInitialLoad();
 		super.onStart();
 	}
-//	@Override
-//	public void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		doInitialLoad();
-//	}
-	
+
+	// @Override
+	// public void onCreate(Bundle savedInstanceState) {
+	// super.onCreate(savedInstanceState);
+	// doInitialLoad();
+	// }
+
 	public void doInitialLoad() {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -69,43 +71,50 @@ public class ContentActivity extends Activity {
 		}
 		String stringExtra = getIntent().getStringExtra("content");
 		WebView tv = (WebView) findViewById(R.id.textView1);
-		//These two settings scale the page to the screen
-		//tv.getSettings().setSupportZoom( true ); //Modify this 
-		//tv.getSettings().setDefaultZoom(WebSettings.ZoomDensity.FAR);//Add this
+		// These two settings scale the page to the screen
+		// tv.getSettings().setSupportZoom( true ); //Modify this
+		// tv.getSettings().setDefaultZoom(WebSettings.ZoomDensity.FAR);//Add
+		// this
 		// getActionBar().
 		// Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 		// String second=get(parcelableExtra,
 		// stringExtra.substring(stringExtra.length()-10));
-		
+
 		if (value == null) {
-			
-			value= initial = stringExtra;
+
+			value = initial = stringExtra;
 			stringExtra += "<br> loading ....";
 			loadData(tv, stringExtra, 0);
 
-			new AsyncTask<String, Void, String>() {
+			atask = new AsyncTask<String, Void, String>() {
 
 				@Override
 				protected String doInBackground(String... params) {
 					String stringExtra = getIntent().getStringExtra("content");
 
 					Uri parcelableExtra = getIntent().getParcelableExtra("uri");
-					
+
 					try {
-						Document doc = Jsoup.connect(parcelableExtra.toString()).get();
-						stringExtra =doc.getElementById("body").toString();
-						stringExtra =doc.getElementsByClass("article-body").get(0).toString();
+						Document doc = Jsoup
+								.connect(parcelableExtra.toString()).get();
+						stringExtra = doc.getElementById("body").toString();
+						stringExtra = doc.getElementsByClass("article-body")
+								.get(0).toString();
 						Element comments = doc.getElementById("comments");
-						
+
 						comments.getElementById("eP").remove();
 						comments.getElementById("e").remove();
+//						Elements ele = doc.select("iframe[src]");
+//						ele.before("<a href=" + ele.get(0).attr("src")
+//								+ ">youtube</a>");
+
 						getIntent().putExtra("comments", comments.toString());
 					} catch (IOException e) {
 						error = "Unable to load";
-						
+
 					}
 
-					//stringExtra = ContentActivity.this.get(parcelableExtra);
+					// stringExtra = ContentActivity.this.get(parcelableExtra);
 					value = stringExtra + "<a href=" + parcelableExtra
 							+ "> go to kos page</a>";
 					return null;
@@ -113,10 +122,11 @@ public class ContentActivity extends Activity {
 
 				@Override
 				protected void onPostExecute(String result) {
-					
-					if(error != null){
-						Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
-						
+
+					if (error != null) {
+						Toast.makeText(getApplicationContext(), error,
+								Toast.LENGTH_LONG).show();
+
 						error = null;
 						return;
 					}
@@ -135,12 +145,11 @@ public class ContentActivity extends Activity {
 					Toast toast = Toast.makeText(context, text, duration);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
-					
+
 					// Get the current WebView position
 					WebView tv = (WebView) findViewById(R.id.textView1);
 					loadData(tv, value, tv.getScrollY());
-					
-					
+
 				}
 			}.execute("");
 			return;
@@ -181,7 +190,7 @@ public class ContentActivity extends Activity {
 
 		// ScrollY is only available in ICS or later
 		setScrollYPos(tv, yPos);
-		
+
 		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
 				"text/html", "UTF-8", "about:blank");
 	}
@@ -205,14 +214,13 @@ public class ContentActivity extends Activity {
 		return stringExtra;
 	}
 
-	public static void ignoreImages(Activity a,
-			SharedPreferences preferences) {
-		
+	public static void ignoreImages(Activity a, SharedPreferences preferences) {
+
 		WebView tv = (WebView) a.findViewById(R.id.textView1);
-		
-		tv.getSettings().setLoadsImagesAutomatically(preferences.getBoolean("imagesEnabled", false));
-		
-		
+
+		tv.getSettings().setLoadsImagesAutomatically(
+				preferences.getBoolean("imagesEnabled", false));
+
 	}
 
 	@Override
@@ -250,86 +258,96 @@ public class ContentActivity extends Activity {
 			myIntent.putExtra("comments", stringExtra);
 			ContentActivity.this.startActivity(myIntent);
 		} else {
-			Toast.makeText(getApplicationContext(),"Not Loaded Yet", Toast.LENGTH_SHORT).show();
-			
+			Toast.makeText(getApplicationContext(), "Not Loaded Yet",
+					Toast.LENGTH_SHORT).show();
+
 		}
 
 	}
 
-//	public String get(Uri uri) {
-//		try {
-//			HttpClient httpClient = new DefaultHttpClient();
-//			HttpContext localContext = new BasicHttpContext();
-//			HttpGet httpGet = new HttpGet("" + uri);
-//			HttpResponse response = httpClient.execute(httpGet, localContext);
-//			StringBuffer result = new StringBuffer();
-//			StringBuffer comments = new StringBuffer();
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(
-//					response.getEntity().getContent()));
-//
-//			String line = null;
-//			int count = 0;
-//			while ((line = reader.readLine()) != null) {
-//				if (count > 2) {
-//
-//					if (line.contains("<li id=\"c2\">")) {
-//						count = 4;
-//					}
-//					if (count == 4) {
-//						// Log.d("content", line);
-//						comments.append(line + "\n");
-//					}
-//					if (line.contains("<li id=\"eP\">")) {
-//						this.getIntent().putExtra("comments",
-//								comments.toString());
-//						break;
-//					}
-//				}
-//
-//				if (count > 0 && count < 3) {
-//					// Log.d("content", line);
-//					result.append(line + "\n");
-//					if (line.contains("</div>")) {
-//						count++;
-//
-//					}
-//				} else {
-//					if (line.contains("<div id=\"intro\">")) {
-//						count = 1;
-//					}
-//				}
-//			}
-//			return result.toString();
-//		} catch (Throwable e) {
-//			error = "Unable to load";
-//		}
-//		return null;
-//	}
+	// public String get(Uri uri) {
+	// try {
+	// HttpClient httpClient = new DefaultHttpClient();
+	// HttpContext localContext = new BasicHttpContext();
+	// HttpGet httpGet = new HttpGet("" + uri);
+	// HttpResponse response = httpClient.execute(httpGet, localContext);
+	// StringBuffer result = new StringBuffer();
+	// StringBuffer comments = new StringBuffer();
+	// BufferedReader reader = new BufferedReader(new InputStreamReader(
+	// response.getEntity().getContent()));
+	//
+	// String line = null;
+	// int count = 0;
+	// while ((line = reader.readLine()) != null) {
+	// if (count > 2) {
+	//
+	// if (line.contains("<li id=\"c2\">")) {
+	// count = 4;
+	// }
+	// if (count == 4) {
+	// // Log.d("content", line);
+	// comments.append(line + "\n");
+	// }
+	// if (line.contains("<li id=\"eP\">")) {
+	// this.getIntent().putExtra("comments",
+	// comments.toString());
+	// break;
+	// }
+	// }
+	//
+	// if (count > 0 && count < 3) {
+	// // Log.d("content", line);
+	// result.append(line + "\n");
+	// if (line.contains("</div>")) {
+	// count++;
+	//
+	// }
+	// } else {
+	// if (line.contains("<div id=\"intro\">")) {
+	// count = 1;
+	// }
+	// }
+	// }
+	// return result.toString();
+	// } catch (Throwable e) {
+	// error = "Unable to load";
+	// }
+	// return null;
+	// }
 
 	public String stripHtml(String a) {
 		Html.fromHtml(a);
 		return null;
 		// return a.replaceAll("<(^a|^p|^\\s|^blockquote)+?>", "");
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putString("value", value);
-		
+
 		super.onSaveInstanceState(outState);
 	}
+
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		value = savedInstanceState.getString("value");
-		
+
 		super.onRestoreInstanceState(savedInstanceState);
 	}
-	
+
 	@TargetApi(14)
-	private void setScrollYPos(WebView tv, int yPos){
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+	private void setScrollYPos(WebView tv, int yPos) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			tv.setScrollY(yPos);
 		}
 	}
 
+	@Override
+	protected void onPause() {
+		if (atask != null) {
+			atask.cancel(true);
+
+		}
+		super.onPause();
+	}
 }
