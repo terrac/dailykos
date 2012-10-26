@@ -18,6 +18,13 @@ public class CommentsActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_content_no_bar);
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (!preferences.getBoolean(("displayAd"), true)) {
+			findViewById(R.id.adView).setVisibility(View.GONE);
+		}
+		
 		doInitialLoad();
 
 	}
@@ -36,36 +43,34 @@ public class CommentsActivity extends Activity {
 		tv.setWebChromeClient(new WebChromeClient());
 		tv.getSettings().setJavaScriptEnabled(true);
 		
-		String stringExtra = "<style type=\"text/css\">"
+		StringBuffer stringExtra = new StringBuffer("<style type=\"text/css\">"
 			+ "A:link {text-decoration: none; color: orange;}"
 			+ "A:visited {text-decoration: none; color: #654B0F;}"
 			+ "A:active {text-decoration: none; color: orange;}"
 			+ "A:hover {text-decoration: underline; color: #654B0F;}"
-			+ "</style>";
+			+ "</style>"+ContentActivity.jquery);
 
-		ContentActivity.ignoreImages(this, preferences);
-		stringExtra = ContentActivity.fontSize(stringExtra, preferences);
+		ContentActivity.ignoreImages(this, preferences,stringExtra);
+		ContentActivity.fontSize(stringExtra, preferences);
 
-		stringExtra += getIntent().getStringExtra("comments");
-		stringExtra = showRecomended(stringExtra, preferences);
+		stringExtra.append(getIntent().getStringExtra("comments"));
+		showRecomended(stringExtra, preferences);
 
-		Log.d("com", stringExtra);
-		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
+		//Log.d("com", stringExtra.to);
+		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra.toString(),
 				"text/html", "UTF-8", "about:blank");
 
 	}
 
-	private String showRecomended(String stringExtra,
+	private void showRecomended(StringBuffer stringExtra,
 			SharedPreferences preferences) {
 
 		// String string = getResources().getString(R.string.comment_script);
-		String a = "<script src=https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js></script>"
-				+ addScript(scr);
-		stringExtra = a.replace("numberOfRecommends",
+		String a =  addScript(scr);
+		stringExtra.insert(0,a.replace("numberOfRecommends",
 				preferences.getString("recommendsHide", "0"))
-				+ stringExtra+addScript(hideRecs);
-
-		return stringExtra;
+				);
+		stringExtra.append(addScript(hideRecs));
 	}
 
 	String scr = "var i = numberOfRecommends;\r\n"

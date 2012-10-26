@@ -23,13 +23,14 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.Toast;
 
 public class ContentActivity extends Activity {
 
-	String value;
-	String initial;
+	StringBuffer value;
+	StringBuffer initial;
 	private String error;
 	private AsyncTask<String, Void, String> atask;
 	final public static String css = "		<script type=\"text/javascript\"><!--\n"
@@ -45,7 +46,42 @@ public class ContentActivity extends Activity {
 			+ "A:active {text-decoration: none; color: orange;}"
 			+ "A:hover {text-decoration: underline; color: #654B0F;}"
 			+ "</style>";
-
+	static String iframetoLink = 
+			"   $(\"iframe\").each(function(i, elem) {\r\n" + 
+			"            var img = $(elem);\r\n" + 
+			"            var name = img.attr(\"alt\");\r\n" + 
+			"            if (name == \"\"||name ==undefined) {\r\n" + 
+			"                name = \"youtube\";"+
+			"\r\n" + 
+			"\r\n" + 
+			"            }\r\n" + 
+			"            var link = \"<a href=\" + img.attr(\"src\") + \">\" + name + \"</a>\";\r\n" + 
+			"\r\n" + 
+			"\r\n" + 
+			"            img.replaceWith(link);\r\n" + 
+			"        });\r\n" + 
+			"  \r\n";
+	static String imagetoLink = 
+			"   $(\"img\").each(function(i, elem) {\r\n" + 
+			"            var img = $(elem);\r\n" + 
+			"            var name = img.attr(\"alt\");\r\n" + 
+			"            if (name == \"\"||name ==undefined) {\r\n" + 
+			"                name = img.attr(\"src\");\r\n" + 
+			"                var fileNameIndex = name.lastIndexOf(\"/\") + 1;\r\n" + 
+			"                var name = name.substr(fileNameIndex);\r\n" + 
+			"\r\n" + 
+			"\r\n" + 
+			"            }\r\n" + 
+			"            var link = \"<a href=\" + img.attr(\"src\") + \">\" + name + \"</a>\";\r\n" + 
+			"\r\n" + 
+			"\r\n" + 
+			"            img.replaceWith(link);\r\n" + 
+			"        });\r\n" + 
+			"  \r\n";
+	
+	static String jquery ="        <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js\"></script>\r\n" + 
+			"        <script src=\"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js\"></script>\r\n" + 
+			"";
 	@Override
 	protected void onStart() {
 		doInitialLoad();
@@ -67,9 +103,13 @@ public class ContentActivity extends Activity {
 
 		} else {
 			setContentView(R.layout.activity_content_no_bar);
+			if (!preferences.getBoolean(("displayAd"), true)) {
+				findViewById(R.id.adView).setVisibility(View.GONE);
+			}
 
 		}
-		String stringExtra = getIntent().getStringExtra("content");
+
+		StringBuffer stringExtra = new StringBuffer(getIntent().getStringExtra("content"));
 		WebView tv = (WebView) findViewById(R.id.textView1);
 		// These two settings scale the page to the screen
 		// tv.getSettings().setSupportZoom( true ); //Modify this
@@ -82,24 +122,26 @@ public class ContentActivity extends Activity {
 
 		if (value == null) {
 
-			value = initial = stringExtra;
-			stringExtra += "<br> loading ....";
+			initial = new StringBuffer(stringExtra);
+			stringExtra.append("<br> loading ....");
+			value = stringExtra;
 			loadData(tv, stringExtra, 0);
 
 			atask = new AsyncTask<String, Void, String>() {
 
 				@Override
 				protected String doInBackground(String... params) {
-					String stringExtra = getIntent().getStringExtra("content");
+					StringBuffer stringExtra = new StringBuffer();
 
 					Uri parcelableExtra = getIntent().getParcelableExtra("uri");
 
 					try {
 						Document doc = Jsoup
 								.connect(parcelableExtra.toString()).get();
-						stringExtra = doc.getElementById("body").toString();
-						stringExtra = doc.getElementsByClass("article-body")
-								.get(0).toString();
+						stringExtra.append(doc.getElementById("intro").toString());
+						stringExtra.append(doc.getElementById("body").toString());
+//						stringExtra = doc.getElementsByClass("article-body")
+//								.get(0).toString();
 						Element comments = doc.getElementById("comments");
 
 						comments.getElementById("eP").remove();
@@ -113,10 +155,10 @@ public class ContentActivity extends Activity {
 						error = "Unable to load";
 
 					}
-
+					stringExtra.append("<a href=" + parcelableExtra
+							+ "> go to kos page</a>");
 					// stringExtra = ContentActivity.this.get(parcelableExtra);
-					value = stringExtra + "<a href=" + parcelableExtra
-							+ "> go to kos page</a>";
+					value = stringExtra;
 					return null;
 				}
 
@@ -139,8 +181,9 @@ public class ContentActivity extends Activity {
 						Uri parcelableExtra = getIntent().getParcelableExtra(
 								"uri");
 
-						value = initial + "<a href=" + parcelableExtra
-								+ "> go to kos page</a>";
+						initial.append( "<a href=" + parcelableExtra
+								+ "> go to kos page</a>");
+						value = initial;
 					}
 					Toast toast = Toast.makeText(context, text, duration);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
@@ -170,35 +213,37 @@ public class ContentActivity extends Activity {
 		}
 	}
 
-	public void loadData(WebView tv, String stringExtra, int yPos) {
+	public void loadData(WebView tv, StringBuffer stringExtra, int yPos) {
 		// if (plainText) {
 		// stringExtra = stripHtml(stringExtra);
 		// }
+		tv.setWebChromeClient(new WebChromeClient());
+		tv.getSettings().setJavaScriptEnabled(true);
+		
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
-
-		stringExtra = css + stringExtra;
-
-		ignoreImages(this, preferences);
-		String ignoreIFrame = "<style type=\"text/css\">\n" + "iframe\n"
-				+ "{ display: none; }\n" + "</style> ";
+		stringExtra.append(jquery);
+		
+		stringExtra.insert(0, css);
+		ignoreImages(this, preferences,stringExtra);
 		if (!preferences.getBoolean("iframeEnabled", false)) {
-			stringExtra = ignoreIFrame + stringExtra;
+			stringExtra.append(CommentsActivity.addScript(iframetoLink));
+			
 		}
 
-		stringExtra = fontSize(stringExtra, preferences);
+		fontSize(stringExtra, preferences);
 
 		// ScrollY is only available in ICS or later
 		setScrollYPos(tv, yPos);
 
-		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra,
+		tv.loadDataWithBaseURL("http://www.dailykos.com", stringExtra.toString(),
 				"text/html", "UTF-8", "about:blank");
 	}
 
-	public static String fontSize(String stringExtra,
+	public static void fontSize(StringBuffer stringExtra,
 			SharedPreferences preferences) {
 		if (!preferences.getBoolean("fontEnabled", false)) {
-			return stringExtra;
+			return ;
 		}
 		int fontSize;
 		try {
@@ -209,18 +254,19 @@ public class ContentActivity extends Activity {
 		if (fontSize != 0) {
 			String size = "<style type=\"text/css\">\n" + "body\n"
 					+ "{ font-size:" + fontSize + "px; }\n" + "</style> ";
-			stringExtra = size + stringExtra;
+			stringExtra.insert(0, size);
 		}
-		return stringExtra;
 	}
 
-	public static void ignoreImages(Activity a, SharedPreferences preferences) {
+	public static void ignoreImages(Activity a, SharedPreferences preferences,StringBuffer sb) {
 
 		WebView tv = (WebView) a.findViewById(R.id.textView1);
 
 		tv.getSettings().setLoadsImagesAutomatically(
 				preferences.getBoolean("imagesEnabled", false));
-
+		if(!preferences.getBoolean("imagesEnabled", false)){
+			sb.append(CommentsActivity.addScript(imagetoLink));	
+		}
 	}
 
 	@Override
@@ -323,14 +369,14 @@ public class ContentActivity extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putString("value", value);
+		outState.putString("value", value.toString());
 
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		value = savedInstanceState.getString("value");
+		value = new StringBuffer(savedInstanceState.getString("value"));
 
 		super.onRestoreInstanceState(savedInstanceState);
 	}
