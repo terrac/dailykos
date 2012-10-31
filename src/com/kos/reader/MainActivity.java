@@ -45,8 +45,8 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		CookieSyncManager.createInstance(getApplicationContext());
-		CookieSyncManager.getInstance().startSync();
+//		CookieSyncManager.createInstance(getApplicationContext());
+//		CookieSyncManager.getInstance().startSync();
 		setContentView(R.layout.activity_main);
 
 		checkVersion();
@@ -372,10 +372,7 @@ public class MainActivity extends Activity {
 
 		// ad
 
-		if (!preferences.getBoolean(("displayAd"), true)) {
-			((AdView)findViewById(R.id.adView)).
-			findViewById(R.id.adView).setVisibility(View.GONE);
-		}
+		ContentActivity.removeAd(this, preferences);
 		// AdView adView = new AdView(this, AdSize.BANNER, "a9876sf98dfg");
 		// RelativeLayout layout = (RelativeLayout) findViewById(R.id.ad);
 		// layout.addView(adView);

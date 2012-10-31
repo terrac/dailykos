@@ -103,9 +103,7 @@ public class ContentActivity extends Activity {
 
 		} else {
 			setContentView(R.layout.activity_content_no_bar);
-			if (!preferences.getBoolean(("displayAd"), true)) {
-				findViewById(R.id.adView).setVisibility(View.GONE);
-			}
+			ContentActivity.removeAd(this,preferences);
 
 		}
 
@@ -198,6 +196,15 @@ public class ContentActivity extends Activity {
 			return;
 		}
 		loadData(tv, value, 0);
+	}
+
+	public static void removeAd(Activity a,SharedPreferences preferences) {
+		if (!preferences.getBoolean(("displayAd"), true)) {
+			View findViewById = a.findViewById(R.id.adView);
+			if(findViewById != null){
+				findViewById.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	public void showTutorial() {

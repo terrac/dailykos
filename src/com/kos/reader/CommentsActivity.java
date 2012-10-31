@@ -21,9 +21,7 @@ public class CommentsActivity extends Activity {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
-		if (!preferences.getBoolean(("displayAd"), true)) {
-			findViewById(R.id.adView).setVisibility(View.GONE);
-		}
+		ContentActivity.removeAd(this, preferences);
 		
 		doInitialLoad();
 

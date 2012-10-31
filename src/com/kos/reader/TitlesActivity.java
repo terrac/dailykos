@@ -26,7 +26,8 @@ import android.widget.Toast;
 
 public class TitlesActivity extends Activity {
 
-    @Override
+    private AsyncTask<String, Void, String> aTask;
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -36,16 +37,14 @@ public class TitlesActivity extends Activity {
 		// ad
 		setContentView(R.layout.activity_titles);
         
-		if (!preferences.getBoolean(("displayAd"), true)) {
-			findViewById(R.id.adView).setVisibility(View.GONE);
-		}
+		ContentActivity.removeAd(this, preferences);
         
         refresh();
 
     }
 
 	private void refresh() {
-		new AsyncTask<String, Void, String>() {
+		aTask =new AsyncTask<String, Void, String>() {
         	RSSFeed feed;
         	boolean error;
         	
@@ -120,5 +119,13 @@ public class TitlesActivity extends Activity {
 		refresh();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	@Override
+	protected void onPause() {
+		if (aTask != null) {
+			aTask.cancel(true);
+
+		}
+		super.onPause();
 	}
 }
